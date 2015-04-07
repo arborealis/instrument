@@ -1,10 +1,19 @@
 ## Instrument: Instrument code for the arborealis project
 
+
 ### Getting it running
 
 1. Install [Processing](https://processing.org/download/)
 2. Install [Minim](http://code.compartmental.net/tools/minim/) and [OscP5](http://www.sojamo.de/libraries/oscP5/)
 3. Run the ArborealisInstrument.pde sketch
+
+
+### Getting up to speed with Processing and Minim
+0. [Processing examples](https://processing.org/examples/)
+1. [Minim](http://code.compartmental.net/minim/)
+2. [Minim ugens](http://code.compartmental.net/minim/index_ugens.html)
+3. [Minim pydoc](http://code.compartmental.net/minim/javadoc/)
+4. Minim examples: In ``Processing``, goto ``File``->``Examples...`` -> ``Minim`` -> ``Synthesis``
 
 
 ### Components
