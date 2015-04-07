@@ -2,163 +2,97 @@ import ddf.minim.*;
 import ddf.minim.ugens.*;
 import java.util.Arrays;
 
-float MAX_DURATION = 1000;
+int NUM_XSECTIONS = 20;      // how many x sections in the instrument 
+float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
 
 Minim minim;
 AudioOutput out;
-GrainInstrument[] instruments;
-float[] durations = new float[20];
 
-class GrainInstrument implements Instrument
-{ 
-  Sampler samp;
-  MultiChannelBuffer buf;
-  boolean onState;
-  
-  GrainInstrument(MultiChannelBuffer buf)
-  { 
-    this.onState = false;
-    this.buf = buf;
-  }
-  
-  void toggle(float duration) {
-    this.onState = !this.onState; 
-    
-    if (this.onState) {
-      println("Turning on with buf size " + this.buf.getBufferSize() + " and duration " + duration);
-      MultiChannelBuffer buf2 = getBufferRange(this.buf, 0, (int)(duration * this.buf.getBufferSize()));       
-      this.samp = new Sampler(buf2, 44100, 2); 
-      this.samp.looping = true;
-            
-      this.samp.patch( out );
-      this.samp.trigger();
-    } else {
-      this.samp.stop();
-      this.samp.unpatch( out );
-    }
-  }
-  
-  void noteOn( float dur )
-  {
-    if (this.onState)
-      this.samp.trigger();
-  }
-  
-  void noteOff()
-  {
-    this.samp.unpatch( out );
-  }
-}
+// create an array to store one instrument for every X position since
+// each gets a different sample to play
+GrainSynthInstrument[] instruments = new GrainSynthInstrument[NUM_XSECTIONS];
+
+// create an array to store the num ms each of the 0-9 keys has been pressed
+float[] keyPressLengths = new float[NUM_XSECTIONS];
+
 
 // setup is run once at the beginning
 void setup()
 {
+  // run the draw() method at 30fps
   frameRate(30);
+  
+  // create the graphics window
   size( 512, 200, P2D );
+  
+  // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
+  
+  // trigger the open file dialog
   selectInput("Select an audio file:", "fileSelected");
 }
 
-float hammingWindow(int length, int index) {
-  return 0.54f - 0.46f * (float) Math.cos(TWO_PI * index / (length - 1));
-}
 
-float hannWindow(int length, int index) {
-  return 0.5f * (1f - (float) Math.cos(TWO_PI * index / (length - 1f)));
-}
-
-float cosineWindow(int length, int index) {
-  return (float)Math.cos(Math.PI * index / (length - 1) - Math.PI / 2);
-}
-
-float rampWindow(int length, int index, int rampUp, int rampDown) {
-  if (index < rampUp) return index / rampUp;
-  else if (index >= length - rampDown) return (length - index) / rampDown;
-  else return 1.0;
-}
-
-// This code is called by the selectInput() method on dialog close
+// This code is called by the selectInput() method when a file has been selected
 void fileSelected(File selection) {  
   // pause time when adding a bunch of notes at once
   // This guarantees accurate timing between all notes added at once.
   out.pauseNotes();
   
   // load sample
-  MultiChannelBuffer buf = new MultiChannelBuffer(1,2);
+  MultiChannelBuffer buf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
   minim.loadFileIntoBuffer(selection.getAbsolutePath(), buf);
   
-  // split sample into subbuffers
+  // split sample into sub-samples of equal size
   int nfTot = buf.getBufferSize();
-  int nfSub = nfTot/20;  
+  int nfSub = nfTot/NUM_XSECTIONS;  
   int nc = buf.getChannelCount();
-  println("samp length: " + nfTot);
-  println("subsamp length: " + nfSub);
+  println("# Sample frames: " + nfTot);
+  println("# Sub-sample frames: " + nfSub);
 
-  instruments = new GrainInstrument[20];
-  
-  for (int s = 0; s < 10; s++) {
+  // Split the main sample buffer into sub-samples
+  // Create the GrainSynthInstruments for each sub-sample
+  for (int s = 0; s < NUM_XSECTIONS; s++) {
     MultiChannelBuffer subBuf = new MultiChannelBuffer(nfSub, nc);
     for (int c = 0; c < nc; c++) {
       float[] frames = buf.getChannel(c);
       float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
       subBuf.setChannel(c, subFrames);
     }
-    instruments[s] = new GrainInstrument(subBuf);
+
+    // Crate the GrainSynthInsturment; and start it by calling playNote
+    // it will not start emmitting sound until it has been enabled with toggle()
+    instruments[s] = new GrainSynthInstrument(subBuf);
     out.playNote( 0.000, 1000, instruments[s] );
   }
 
   out.resumeNotes();
 }
-
-// Use Hanning window to smooth transitions
-float[] applyWindow(float[] buf) {
-  float[] buf2 = new float[buf.length];
-  for (int i = 0; i < buf.length; i++) {
-    buf2[i] = buf[i] * hannWindow(buf.length, i);
-    //buf2[i] = buf[i] * cosineWindow(buf.length, i);
-  }
-  return buf2;
-}
-
-MultiChannelBuffer getBufferRange(MultiChannelBuffer buf, int start, int length) {
-  int nc = buf.getChannelCount();  
-  MultiChannelBuffer buf2 = new MultiChannelBuffer(length, nc);
-  for (int c = 0; c < nc; c++) {
-    float[] frames = buf.getChannel(c);
-    float[] subFrames = Arrays.copyOfRange(frames, start, start+length);
-    
-    // // reverse
-    // for (int i = 0; i < subFrames.length/2; i++) {
-    //   float tmp = subFrames[i];
-    //   subFrames[i] = subFrames[subFrames.length - 1 - i];
-    //   subFrames[subFrames.length - 1 - i] = tmp;
-    // }
-    
-    subFrames = applyWindow(subFrames);
-    buf2.setChannel(c, subFrames);
-  }
-  return buf2;
-}
  
-  
+// called under the hood when a key on the keyboard has been pressed
 void keyPressed() {
-  if (key >= '1' && key <= '9') {
-    int num = key - '1';
-    durations[num] = millis();
-  }
-}
-
-void keyReleased() {
-  if (key >= '1' && key <= '9') {
-    int num = key - '1';
+  if (key >= '0' && key <= '9') {
+    int num = key - '0';
     
-    durations[num] = (millis() - durations[num]) / MAX_DURATION;
-    durations[num] = constrain(durations[num], 0, 1);
-    instruments[num].toggle(durations[num]);
+    // keep track of when the key was pressed
+    keyPressLengths[num] = millis();
   }
 }
 
+// called under the hood when a key on the keyboard has been released
+void keyReleased() {
+  if (key >= '0' && key <= '9') {
+    int num = key - '0';
+    
+    // calculate how long the key has been pressed and turn on the appropriate grain synth instrument
+    keyPressLengths[num] = (millis() - keyPressLengths[num]) / MAX_DURATION;
+    keyPressLengths[num] = constrain(keyPressLengths[num], 0, 1);
+    instruments[num].toggle(keyPressLengths[num]);
+  }
+}
+
+// draw the music visualizer to the screen
 void draw()
 {
   // erase the window to grey
