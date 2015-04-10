@@ -9,6 +9,7 @@ So far communication with TouchOSC has been implemented. This allows 'playing' t
 The instructions below describe how to get this working.
 
 ### Setup instructions
+0. Download the [code](https://github.com/arborealis/instrument/archive/master.zip) in this github repo
 1. Install [Processing](https://processing.org/download/) on your pc
 2. Install [Minim](https://github.com/ddf/Minim/archive/v2.2.0.zip) and [OscP5](http://www.sojamo.de/libraries/oscP5/download/oscP5-0.9.8.zip) on your pc
 3. Install TouchOSC editor for [Mac](http://hexler.net/mint/pepper/orderedlist/downloads/download.php?file=http%3A//hexler.net/pub/touchosc/touchosc-editor-1.7.0-osx.zip) or [Windows](http://hexler.net/pub/touchosc/touchosc-editor-1.7.0-win32.zip) on your pc
@@ -26,7 +27,7 @@ The instructions below describe how to get this working.
   6. Select ``Done`` to go back to the UI screen; you should now see the ``GrainSynth`` tab in the layout with a bunch of red sliders and checkboxes
 
 ### Run instructions
-1. Open ``ArborealisInstrumentOSC.pde`` in Processing on your pc
+1. Open ``ArborealisInstrument/ArborealisInstrumentOSC.pde`` in Processing on your pc
 2. Click the play button to start the sketch
 3. On your mobile device, open ``TouchOSC`` and go to the main screen with the sliders
 4. Select the instrument you'd like to experiment with from the tab bar (currently only ``GrainSynth`` is implemented)
