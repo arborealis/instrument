@@ -4,6 +4,7 @@ import java.util.*;
 class ArborealisInstrument {
   private ArborealisNote[][] notes = new ArborealisNote[NUM_X][NUM_Y];
   private MultiChannelBuffer[] bufs;
+  int activeCount = 0;
   
   ArborealisInstrument(MultiChannelBuffer[] bufs) {
     this.bufs = bufs;
@@ -20,13 +21,16 @@ class ArborealisInstrument {
     return bufs[x];
   }
   
-  void start(int x, int y, int z, ArborealisNote note) {
-    note.start(x, y, z);
+  void start(int x, int y, float z, ArborealisNote note) {
+    assert(notes[x][y] == null);
+    activeCount++;
+    note.start(x, y, z, activeCount);
     notes[x][y] = note;
   }
   
   void stop(int x, int y) {
     if (notes[x][y] != null) {
+      activeCount--;
       notes[x][y].stop();
       notes[x][y] = null;
     }

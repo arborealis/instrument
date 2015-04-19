@@ -1,3 +1,27 @@
+static class GrainSynthADSR {
+  public static float maxAmp(int y, float z, int numNotes) {
+    return 0.5;
+  }
+  
+  static float attackTime(int y, float z, int numNotes) {
+    return map(1.0 / y,  1.0/NUM_Y, 1.0, 0.25, 2.0);
+  }
+
+  static float decayTime(int y, float z, int numNotes) {
+    return 0.25;
+  }
+  
+  static float sustainLevel(int y, float z, int numNotes) {
+    //return log((1.0/numNotes) * ((y * 0.75) + 0.25));
+    return (y * 0.75) + 0.25;
+  }
+  
+  static float releaseTime(int y, float z, int numNotes) {
+    return map(y, 1.0, NUM_Y, 0.5, 4);
+  }    
+}  
+
+
 // A "note" for creating a grain synth effect from an audio sample.
 // Since each GrainSynthNote plays only one sample, we will need
 // a number of these to play each of the different samples.
@@ -38,7 +62,7 @@ class GrainSynthNote implements ArborealisNote
   }
   
   // Start the Note.
-  void start(int x, int y, int z) {    
+  void start(int x, int y, float z, int numNotes) {    
     this.x = x;
     this.y = y;
     this.z = z;
@@ -61,12 +85,11 @@ class GrainSynthNote implements ArborealisNote
     this.samp.looping = true;
           
     // create the ASDR
-    float maxAmp = 0.5;
-    float attackTime = map(1.0 / y2,  1.0/NUM_Y, 1.0, 0.25, 2.0);
-    float decayTime = 0.25;
-    float sustainLevel = float(y2)/NUM_Y * 0.75 + 0.25; //10xlog[(1/number of current tones playing at trigger time) x ((Y x .75) + .25)]
-    float releaseTime = map(y2, 1.0, NUM_Y, 0.5, 4);
-    this.adsr = new ADSR(maxAmp, attackTime, decayTime, sustainLevel, releaseTime); 
+    this.adsr = new ADSR(GrainSynthADSR.maxAmp(y2, z, numNotes), 
+                         GrainSynthADSR.attackTime(y2, z, numNotes),
+                         GrainSynthADSR.decayTime(y2, z, numNotes), 
+                         GrainSynthADSR.sustainLevel(y2, z, numNotes),
+                         GrainSynthADSR.releaseTime(y2, z, numNotes)); 
           
     // send output of the Sampler into the output
     this.samp.patch(this.adsr).patch( this.out );
@@ -75,4 +98,8 @@ class GrainSynthNote implements ArborealisNote
     this.samp.trigger();
     adsr.noteOn();
   }
+  
+  void update(int activNoteCount) {
+  }
+  
 }

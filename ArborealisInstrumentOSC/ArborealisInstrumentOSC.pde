@@ -3,10 +3,10 @@ import ddf.minim.ugens.*;
 import java.util.Arrays;
 
 // constants
-int PORT = 8000;
-float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
-int NUM_X = 20;      // how many x sections in the instrument 
-int NUM_Y = 10;      // how many y sections in the instrument 
+static int PORT = 8000;
+static float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
+static int NUM_X = 20;      // how many x sections in the instrument 
+static int NUM_Y = 10;      // how many y sections in the instrument 
 
 Minim minim;
 AudioOutput out;
