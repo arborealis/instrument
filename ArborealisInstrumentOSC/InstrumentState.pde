@@ -1,5 +1,7 @@
 import java.util.*;
 
+// possible values for instrument, x, and y
+
 // store the state of a single player
 class Player {
   int x, y;
