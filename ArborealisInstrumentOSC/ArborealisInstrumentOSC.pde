@@ -2,6 +2,10 @@ import ddf.minim.*;
 import ddf.minim.ugens.*;
 import java.util.Arrays;
 
+// possible values for instrument, x, and y
+public enum InstrumentType { grainsynth, keyboard, arpeggio; }
+public enum XVal { x1, x2, x3, x4, x5, x6, x7, x8, x9, x10; }
+public enum YVal { y1, y2, y3, y4, y5, y6, y7, y8, y9, y10; }
 
 // constants
 int PORT = 8000;
@@ -65,7 +69,7 @@ void loadGrainSynthFile(String filename) {
 
     // Create the GrainSynthInsturment; and start it by calling playNote
     // it will not start emitting sound until it has been enabled with start()
-    instruments[s] = new GrainSynthInstrument(out, subBuf);
+    instruments[s] = new GrainSynthInstrument(subBuf);
   }
 }
 

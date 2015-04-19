@@ -1,6 +1,7 @@
 import oscP5.*;
 import netP5.*;
 
+public enum Command { sety, active; }
 
 // Manage parsing of OSC messages
 class OSCListener {
