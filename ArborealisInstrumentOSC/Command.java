@@ -1,0 +1,2 @@
+public enum Command { setone };
+

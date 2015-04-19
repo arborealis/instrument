@@ -1,7 +1,6 @@
 import oscP5.*;
 import netP5.*;
 
-public enum Command { sety, active; }
 
 // Manage parsing of OSC messages
 class OSCListener {
@@ -13,7 +12,7 @@ class OSCListener {
   }
   
   // update the state by parsing an OSC command
-  boolean updateState(NetAddress remoteAddress, String path, float[] args, InstrumentState[] instrumentStates) {
+  boolean updateState(NetAddress remoteAddress, String path, float[] args, ArborealisInstrument[] instruments) {
     // ignore some commands
     if (path.equals("/1") || path.equals("/2") || path.equals("/3") || path.equals("/4"))
       return true;
@@ -21,8 +20,8 @@ class OSCListener {
     // '/reset' will clear the instrument state and revert the TouchOSC ui to its initial state
     if (path.equals("/reset") && args.length == 1 && args[0] == 0) {
       sendReset(remoteAddress);
-      for (int i = 0; i < instrumentStates.length; i++)
-        instrumentStates[i].reset();
+      for (int i = 0; i < instruments.length; i++)
+        instruments[i].stopAll();
       return true;
     }
     
@@ -31,24 +30,31 @@ class OSCListener {
     //      /grainsynth/x1/active  1.0  :     activate the player at x=1  
     String[] tokens = path.split("/");
     boolean valid = false;
-    if (tokens.length == 4 && args.length == 1) {
-      try {              
+    if (tokens.length == 5 && args.length == 1) {
+      try {                      
         InstrumentType instrumentType = InstrumentType.valueOf(tokens[1]);
-        InstrumentState instState = instrumentStates[instrumentType.ordinal()];
-        XVal xval = XVal.valueOf(tokens[2]);
-        Command cmd = Command.valueOf(tokens[3]);      
-     
-        int arg = (int) args[0];        
-        valid = true;
-          
+        ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
+        Command cmd = Command.valueOf(tokens[2]); 
+        int y = int(tokens[3]) - 1;     
+        int x = int(tokens[4]) - 1;     
+        assert(x >=0 && x <= NUM_X);
+        assert(y >=0 && y <= NUM_Y);
+        boolean on = args[0] != 0;
+        
+        valid = true;          
+        
         switch(cmd) {
-          case sety: 
-            println("sety: instrument=" + instrumentType.ordinal() + ", x=" + xval.ordinal() + ", arg=" + arg);
-            instState.getFirstPlayer(xval.ordinal()).y = arg;
-            break;
-          case active:
-            println("active: instrument=" + instrumentType.ordinal() + ", x=" + xval.ordinal() + ", arg=" + arg);
-            instState.getFirstPlayer(xval.ordinal()).active = (arg != 0);
+          case setone: 
+            println("setone: instrument=" + instrumentType.ordinal() + ", x=" + x + ", y=" + y + ", state=" + on);
+            
+            if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
+              if (on)
+                instrument.start(x, y, 0, new GrainSynthNote(out, instrument.getSample(x)));
+              else
+                instrument.stop(x,y);
+            } else {
+              assert(false);
+            }
             break;
         }
       } catch (IllegalArgumentException e) {
@@ -64,11 +70,12 @@ class OSCListener {
     
     println("Sending reset to " + address2.toString());
     for (InstrumentType it : InstrumentType.values())
-      for (XVal xval : XVal.values())
-        for (Command cmd : Command.values()) {
-          String path = "/" + it + "/" + xval + "/" + cmd;
-          OscMessage msg = new OscMessage(path, new Object[] {new Float(0)});
-          //println("Sending: " + msg.toString()); 
+      for (int x = 0; x < NUM_X; x++)
+        for (int y = 0; y < NUM_Y; y++)
+          for (Command cmd : Command.values()) {
+          String path = "/" + it + "/" + cmd;
+          OscMessage msg = new OscMessage(path, new Object[] {new Integer(x), new Integer(y), new Integer(0)});
+          println("Sending: " + msg.toString()); 
           this.oscP5.send(msg, address2);
         }
   }  

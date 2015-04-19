@@ -2,24 +2,17 @@ import ddf.minim.*;
 import ddf.minim.ugens.*;
 import java.util.Arrays;
 
-// possible values for instrument, x, and y
-public enum InstrumentType { grainsynth, keyboard, arpeggio; }
-public enum XVal { x1, x2, x3, x4, x5, x6, x7, x8, x9, x10; }
-public enum YVal { y1, y2, y3, y4, y5, y6, y7, y8, y9, y10; }
-
 // constants
 int PORT = 8000;
 float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
-int NUM_XSECTIONS = XVal.values().length;      // how many x sections in the instrument 
+int NUM_X = 20;      // how many x sections in the instrument 
+int NUM_Y = 10;      // how many y sections in the instrument 
 
 Minim minim;
 AudioOutput out;
 
-// array with one instrument for every X position since each gets a different sample to play
-GrainSynthInstrument[] instruments = new GrainSynthInstrument[NUM_XSECTIONS];
-
-// array storing the state of each instrument: which players are where on the board
-InstrumentState[] instrumentStates = new InstrumentState[InstrumentType.values().length];
+// array storing the instruments
+ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
 
 OSCListener oscListener = new OSCListener(this, PORT);
 
@@ -36,46 +29,43 @@ void setup()
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
   
-  for (int i = 0; i < instrumentStates.length; i++)
-    instrumentStates[i] = new InstrumentState();
-    
   // trigger the open file dialog or load the file directly
   //selectInput("Select an audio file:", "fileSelected");
-  loadGrainSynthFile("../samples/GRAIN.WAV");
+  instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN.WAV"));
 }
 
-// load a file from disk, split it and create instruments from the samples
-void loadGrainSynthFile(String filename) {  
+// load a file from disk, split it evenly and create instruments from the samples
+// TODO: allow splitting based on returns to zero (RTZ)
+MultiChannelBuffer[] parseSampleFile(String filename) {  
+  MultiChannelBuffer[] bufs = new MultiChannelBuffer[NUM_X];
+  
   // load sample
-  MultiChannelBuffer buf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
-  minim.loadFileIntoBuffer(filename, buf);
+  MultiChannelBuffer mainBuf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
+  minim.loadFileIntoBuffer(filename, mainBuf);
   
   // split sample into sub-samples of equal size
-  int nfTot = buf.getBufferSize();
-  int nfSub = nfTot/NUM_XSECTIONS;  
-  int nc = buf.getChannelCount();
+  int nfTot = mainBuf.getBufferSize();
+  int nfSub = nfTot/NUM_X;  
+  int nc = mainBuf.getChannelCount();
   println("# Sample frames: " + nfTot);
   println("# Sub-sample frames: " + nfSub);
 
   // Split the main sample buffer into sub-samples
-  // Create the GrainSynthInstruments for each sub-sample
-  for (int s = 0; s < NUM_XSECTIONS; s++) {
-    MultiChannelBuffer subBuf = new MultiChannelBuffer(nfSub, nc);
+  for (int s = 0; s < NUM_X; s++) {
+    bufs[s] = new MultiChannelBuffer(nfSub, nc);
     for (int c = 0; c < nc; c++) {
-      float[] frames = buf.getChannel(c);
+      float[] frames = mainBuf.getChannel(c);
       float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
-      subBuf.setChannel(c, subFrames);
+      bufs[s].setChannel(c, subFrames);
     }
-
-    // Create the GrainSynthInsturment; and start it by calling playNote
-    // it will not start emitting sound until it has been enabled with start()
-    instruments[s] = new GrainSynthInstrument(subBuf);
   }
+  
+  return bufs;
 }
 
 // This code is called by the selectInput() method when a file has been selected
 void fileSelected(File selection) {  
-  loadGrainSynthFile(selection.getAbsolutePath());
+  instruments[0] = new ArborealisInstrument(parseSampleFile(selection.getAbsolutePath()));
 }
  
 // draw the music visualizer to the screen
@@ -107,24 +97,10 @@ void oscEvent(OscMessage msg) {
     args[i] = msg.get(i).floatValue();
     
   // check for incoming OSC messages and update the instruments' states
-  boolean valid = oscListener.updateState(msg.netAddress(), msg.addrPattern(), args, instrumentStates);
+  boolean valid = oscListener.updateState(msg.netAddress(), msg.addrPattern(), args, instruments);
       
   if (!valid) {
     println("Invalid osc message: " + msg.toString());
-  } else {
-    InstrumentState instState = instrumentStates[InstrumentType.grainsynth.ordinal()];
-    
-    // For each player we are aware of, either start or stop their instrument based on the current state
-    for (Object obj : instState.getAllPlayers()) {
-      Player player = (Player) obj;
-      float duration = float(player.y) / (YVal.values().length - 1);
-      
-      // start and stop the instruments
-      if (!player.active)
-        instruments[player.x].stop();
-      else
-        instruments[player.x].start(duration);
-    }
   }
 }
 
