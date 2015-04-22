@@ -5,11 +5,13 @@ import java.util.Arrays;
 // constants
 static int PORT = 8000;
 static float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
-static int NUM_X = 20;      // how many x sections in the instrument 
+static int NUM_X = 10;      // how many x sections in the instrument 
 static int NUM_Y = 10;      // how many y sections in the instrument 
+static int XFADE_LENGTH = 100;
 
 Minim minim;
 AudioOutput out;
+boolean pause = false;
 
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
@@ -32,6 +34,8 @@ void setup()
   // trigger the open file dialog or load the file directly
   //selectInput("Select an audio file:", "fileSelected");
   instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN.WAV"));
+
+  instruments[0].start(0, 5, 0, new GrainSynthNote(out, instruments[0].getSample(0)));
 }
 
 // load a file from disk, split it evenly and create instruments from the samples
@@ -71,6 +75,9 @@ void fileSelected(File selection) {
 // draw the music visualizer to the screen
 void draw()
 {
+  if (pause)
+    return;
+    
   // erase the window to grey
   background( 192 );
   // draw using a black stroke
@@ -104,7 +111,14 @@ void oscEvent(OscMessage msg) {
   }
 }
 
+void keyPressed() {
+  if (key == ' ')
+    pause = true;
+}
 
+void keyReleased() {
+  pause = false;
+} 
   
   
 

@@ -36,7 +36,10 @@ class OSCListener {
         ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
         Command cmd = Command.valueOf(tokens[2]); 
         int y = int(tokens[3]) - 1;     
-        int x = int(tokens[4]) - 1;     
+        int x = int(tokens[4]) - 1;
+   
+        y *= 2;
+        
         assert(x >=0 && x <= NUM_X);
         assert(y >=0 && y <= NUM_Y);
         boolean on = args[0] != 0;
@@ -70,13 +73,13 @@ class OSCListener {
     
     println("Sending reset to " + address2.toString());
     for (InstrumentType it : InstrumentType.values())
-      for (int x = 0; x < NUM_X; x++)
-        for (int y = 0; y < NUM_Y; y++)
-          for (Command cmd : Command.values()) {
-          String path = "/" + it + "/" + cmd;
+      for (int x = 0; x < NUM_X; x++) {
+        for (int y = 0; y < NUM_Y; y++) {
+          String path = "/" + it;
           OscMessage msg = new OscMessage(path, new Object[] {new Integer(x), new Integer(y), new Integer(0)});
           println("Sending: " + msg.toString()); 
           this.oscP5.send(msg, address2);
         }
+      }
   }  
 }

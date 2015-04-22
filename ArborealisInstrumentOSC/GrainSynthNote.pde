@@ -28,48 +28,47 @@ static class GrainSynthADSR {
 class GrainSynthNote implements ArborealisNote
 { 
   AudioOutput out;
-  Sampler samp;            // the currently running sampler
+  SamplerXFade samp;            // the currently running sampler
   MultiChannelBuffer buf;  // the input buffer containing the whole sample
   float duration;
   ADSR adsr;
-  int x, y;
+  int x, y, numNotes;
   float z;
   
   // Create an instrument from an audio buffer
-  GrainSynthNote(AudioOutput out, MultiChannelBuffer buf)
+  GrainSynthNote(AudioOutput _out, MultiChannelBuffer _buf)
   { 
-    this.out = out;
-    this.buf = buf;
-    this.samp = null;
+    out = _out;
+    buf = _buf;
+    samp = null;
   }
 
   void stop() {
-    if (this.samp != null) {
+    if (samp != null) {
       println("Stopping grain synth");
       
-      this.adsr.unpatchAfterRelease(this.out);
-      this.adsr.noteOff();
+      adsr.unpatchAfterRelease(out);
+      adsr.noteOff();
 
       // FIX we should stop the sample and unpatch it but if we do it right here, it could cause the 
       // sample to get cutoff, so just stop the looping
-      //this.samp.looping = false;
+      samp.looping = false;
       
       // this.samp.stop(); // stop the Sampler Ugen
       // this.samp.unpatch( out ); // stop sending the sample to the output
       
-      this.samp = null;
+      samp = null;
     }
   }
   
   // Start the Note.
-  void start(int x, int y, float z, int numNotes) {    
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    
-    int y2 = y + 1;
-    
-    if (this.samp != null) {
+  void start(int _x, int _y, float _z, int _numNotes) {    
+    x = _x;
+    y = _y + 1;
+    z = _z;
+    numNotes = _numNotes;
+        
+    if (samp != null) {
       println("Ignoring attempt to start grain synth while already playing");
       return;
     }
@@ -77,29 +76,31 @@ class GrainSynthNote implements ArborealisNote
     println("Starting grain synth with duration: " + duration);
     
     // select the part of the sample we want to play
-    float duration = float(y2) / NUM_Y;
-    MultiChannelBuffer buf2 = getBufferRange(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
+    float duration = float(y) / NUM_Y;
+    MultiChannelBuffer buf2 = getSubBuffer(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
     
     // create a Sampler Ugen and turn on looping
-    this.samp = new Sampler(buf2, 44100, 1); 
-    this.samp.looping = true;
+    samp = new SamplerXFade(buf2, 44100, 1, XFADE_LENGTH); 
+    samp.looping = true;
           
     // create the ASDR
-    this.adsr = new ADSR(GrainSynthADSR.maxAmp(y2, z, numNotes), 
-                         GrainSynthADSR.attackTime(y2, z, numNotes),
-                         GrainSynthADSR.decayTime(y2, z, numNotes), 
-                         GrainSynthADSR.sustainLevel(y2, z, numNotes),
-                         GrainSynthADSR.releaseTime(y2, z, numNotes)); 
+    adsr = new ADSR(GrainSynthADSR.maxAmp(y, z, numNotes), 
+                         GrainSynthADSR.attackTime(y, z, numNotes),
+                         GrainSynthADSR.decayTime(y, z, numNotes), 
+                         GrainSynthADSR.sustainLevel(y, z, numNotes),
+                         GrainSynthADSR.releaseTime(y, z, numNotes)); 
           
     // send output of the Sampler into the output
-    this.samp.patch(this.adsr).patch( this.out );
+    samp.patch( adsr ).patch( out );
     
     // start playing the Sampler Ugen and the ADSR envelope
-    this.samp.trigger();
+    samp.trigger();
     adsr.noteOn();
   }
   
-  void update(int activNoteCount) {
+  void update(int _numNotes) {
+    numNotes = _numNotes;
+    // FIX: update ADSR
   }
   
 }
