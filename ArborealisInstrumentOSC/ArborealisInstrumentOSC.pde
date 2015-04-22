@@ -35,7 +35,7 @@ void setup()
   //selectInput("Select an audio file:", "fileSelected");
   instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN.WAV"));
 
-  instruments[0].start(0, 5, 0, new GrainSynthNote(out, instruments[0].getSample(0)));
+  //instruments[0].start(0, 5, 0, new GrainSynthNote(out, instruments[0].getSample(0)));
 }
 
 // load a file from disk, split it evenly and create instruments from the samples

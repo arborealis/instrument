@@ -50,13 +50,6 @@ class GrainSynthNote implements ArborealisNote
       adsr.unpatchAfterRelease(out);
       adsr.noteOff();
 
-      // FIX we should stop the sample and unpatch it but if we do it right here, it could cause the 
-      // sample to get cutoff, so just stop the looping
-      samp.looping = false;
-      
-      // this.samp.stop(); // stop the Sampler Ugen
-      // this.samp.unpatch( out ); // stop sending the sample to the output
-      
       samp = null;
     }
   }
