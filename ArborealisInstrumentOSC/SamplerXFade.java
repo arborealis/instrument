@@ -114,6 +114,11 @@ public class SamplerXFade extends UGen
 		createInputs();
 	}
 	
+	float addAmplitudes(float a1, float a2) {
+		return (float) (10 * Math.log10(Math.pow(10.0,a1/10) + Math.pow(10.0,a2/10)));
+	}
+
+
 	/**
 	 * Create a SamplerXFade that will use the audio in the provided MultiChannelBuffer
 	 * for its sample. It will make a copy of the data, so modifying the provided
@@ -294,13 +299,13 @@ public class SamplerXFade extends UGen
 				if (sampleRel1 < xfadeLength) {
 					float f1 = outAmp * sampleData.getSample( sourceChannel, sample );
 					float f2 = outAmp * sampleData.getSample( sourceChannel, endSample-(xfadeLength-sampleRel1) );
-					sampleFrame[c] += f1 * sampleRel1 / xfadeLength + f2 * (xfadeLength - sampleRel1) / xfadeLength;
+					sampleFrame[c] += addAmplitudes(f1 * sampleRel1 / xfadeLength, f2 * (xfadeLength - sampleRel1) / xfadeLength);
 				} else if (sampleRel2 < xfadeLength) {
 					float f1 = outAmp * sampleData.getSample( sourceChannel, sample );
 					float f2 = outAmp * sampleData.getSample( sourceChannel, endSample-(xfadeLength-sampleRel2) );
-					sampleFrame[c] += f1 * sampleRel2 / xfadeLength + f2 * (xfadeLength - sampleRel2) / xfadeLength;
+					sampleFrame[c] += addAmplitudes(f1 * sampleRel2 / xfadeLength, f2 * (xfadeLength - sampleRel2) / xfadeLength);
 				} else {
-					sampleFrame[c] = outAmp * sampleData.getSample( sourceChannel, sample );					
+					sampleFrame[c] += outAmp * sampleData.getSample( sourceChannel, sample );					
 				}
 			}
 			

@@ -4,10 +4,9 @@ import java.util.Arrays;
 
 // constants
 static int PORT = 8000;
-static float MAX_DURATION = 1000;   // how long to hold a key for to get 100% of the sample to play 
 static int NUM_X = 10;      // how many x sections in the instrument 
 static int NUM_Y = 10;      // how many y sections in the instrument 
-static int XFADE_LENGTH = 100;
+static int XFADE_LENGTH = 1000;
 
 Minim minim;
 AudioOutput out;
@@ -33,7 +32,7 @@ void setup()
   
   // trigger the open file dialog or load the file directly
   //selectInput("Select an audio file:", "fileSelected");
-  instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN.WAV"));
+  instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
 
   //instruments[0].start(0, 5, 0, new GrainSynthNote(out, instruments[0].getSample(0)));
 }

@@ -82,8 +82,11 @@ class GrainSynthNote implements ArborealisNote
                          GrainSynthADSR.decayTime(y, z, numNotes), 
                          GrainSynthADSR.sustainLevel(y, z, numNotes),
                          GrainSynthADSR.releaseTime(y, z, numNotes)); 
-          
+    
+    RemoveClick removeClick = new RemoveClick(4096, 4);
+
     // send output of the Sampler into the output
+    //samp.patch( removeClick ).patch( adsr ).patch( out );
     samp.patch( adsr ).patch( out );
     
     // start playing the Sampler Ugen and the ADSR envelope
