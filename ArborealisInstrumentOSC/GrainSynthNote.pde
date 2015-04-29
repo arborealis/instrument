@@ -1,6 +1,7 @@
 static class GrainSynthFuncs {
   public static float adsrMaxAmp(int y, float z, int numNotes) {
-    return GrainSynthSettings.ADSR_MAX_AMPLITUDE;
+    numNotes = constrain(numNotes, 1, NUM_X);
+    return map(numNotes, 1, NUM_X, GrainSynthSettings.ADSR_MAX_AMPLITUDE, GrainSynthSettings.ADSR_MAX_AMPLITUDE/log(NUM_X));
   }
   
   static float adsrAttackTime(int y, float z, int numNotes) {
@@ -21,8 +22,8 @@ static class GrainSynthFuncs {
   }    
 
   static float highPassFreq(int y, float z, int numNotes) {
-    return constrain(map(numNotes, 1, NUM_X, 
-      GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY), 
+    numNotes = constrain(numNotes, 1, NUM_X);
+    return map(numNotes, 1, NUM_X, 
       GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY);
   }
 }  

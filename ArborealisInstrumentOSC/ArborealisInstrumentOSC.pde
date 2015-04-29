@@ -1,5 +1,6 @@
 //////////// Start of parameters to edit ////////////
-static final int OSC_PORT = 8000;
+static final int OSC_RECEIVE_PORT = 8000;
+static final int OSC_SEND_PORT = 9000;
 static final int NUM_X = 10;      // how many x sections in the instrument 
 static final int NUM_Y = 10;      // how many y sections in the instrument 
 static final boolean RECORD = true; // whether to record the audio and write to file on spacebar keypress
@@ -44,7 +45,7 @@ AudioRecorder recorder;
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
 
-OSCListener oscListener = new OSCListener(this, OSC_PORT);
+OSCListener oscListener = new OSCListener(this, OSC_RECEIVE_PORT);
 
 // setup is run once at the beginning
 void setup()
@@ -64,6 +65,8 @@ void setup()
   // trigger the open file dialog or load the file directly
   //selectInput("Select an audio file:", "fileSelected");
   instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
+  instruments[1] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
+  instruments[2] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
 
   // debugging: play a note on startup
   //instruments[0].start(1, 9, 0, new GrainSynthNote(out, instruments[0].getSample(1)));
@@ -124,7 +127,7 @@ void draw()
 
 // handler managed by OscP5 that listens to OSC messages
 void oscEvent(OscMessage msg) {
-  //println("Received osc message: " + msg.toString());
+  println("Received osc message: " + msg.toString());
 
   // parse args; currently we expect all floats
   float[] args = new float[msg.arguments().length];

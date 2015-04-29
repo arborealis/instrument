@@ -17,9 +17,16 @@ class OSCListener {
     if (path.equals("/1") || path.equals("/2") || path.equals("/3") || path.equals("/4"))
       return true;
     
+    println(args.length);
+    println(args[0]);
+
     // '/reset' will clear the instrument state and revert the TouchOSC ui to its initial state
-    if (path.equals("/reset") && args.length == 1 && args[0] == 0) {
+    if (path.equals("/reset")) {
       sendReset(remoteAddress);
+
+      // println("gothere");
+      // if (true) return true;
+
       for (int i = 0; i < instruments.length; i++)
         instruments[i].stopAll();
       return true;
@@ -69,17 +76,21 @@ class OSCListener {
   
   // send the paths to each TouchOSC ui element followed by a 0 to return them to their initial states
   void sendReset(NetAddress address) {
-    NetAddress address2 = new NetAddress(address.address(), 9000);
+    NetAddress address2 = new NetAddress(address.address(), OSC_SEND_PORT);
     
     println("Sending reset to " + address2.toString());
     for (InstrumentType it : InstrumentType.values())
-      for (int x = 0; x < NUM_X; x++) {
-        for (int y = 0; y < NUM_Y; y++) {
-          String path = "/" + it;
-          OscMessage msg = new OscMessage(path, new Object[] {new Integer(x), new Integer(y), new Integer(0)});
-          println("Sending: " + msg.toString()); 
-          this.oscP5.send(msg, address2);
+      for (Command cmd : Command.values())
+        for (int x = 0; x < NUM_X; x++) {
+          for (int y = 0; y < NUM_Y; y++) {
+            String path = "/" + it + "/" + cmd;
+            OscMessage msg = new OscMessage(path);
+            msg.add(x);
+            msg.add(y);
+            msg.add(0);
+            println("Sending: " + msg.toString()); 
+            this.oscP5.send(msg, address2);
+          }
         }
-      }
   }  
 }
