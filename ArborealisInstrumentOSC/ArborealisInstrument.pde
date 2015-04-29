@@ -14,9 +14,21 @@ class ArborealisInstrument {
   void stopAll() {
     for (int x = 0; x < NUM_X; x++)
       for (int y = 0; y < NUM_Y; y++)
-        stop(x,y);
+        if (notes[x][y] != null) {
+          activeCount--;
+          notes[x][y].stop();
+          notes[x][y] = null;
+        }
+    updateAll();
   }
  
+  void updateAll() {
+    for (int x = 0; x < NUM_X; x++)
+      for (int y = 0; y < NUM_Y; y++)
+        if (notes[x][y] != null)
+          notes[x][y].update(activeCount);
+  }
+
   MultiChannelBuffer getSample(int x) {
     return bufs[x];
   }
@@ -24,6 +36,9 @@ class ArborealisInstrument {
   void start(int x, int y, float z, ArborealisNote note) {
     assert(notes[x][y] == null);
     activeCount++;
+
+    updateAll();
+
     note.start(x, y, z, activeCount);
     notes[x][y] = note;
   }
@@ -34,5 +49,6 @@ class ArborealisInstrument {
       notes[x][y].stop();
       notes[x][y] = null;
     }
+    updateAll();
   }
 }
