@@ -13,11 +13,21 @@ float cosineWindow(int length, int index) {
   return (float)Math.cos(Math.PI * index / (length - 1) - Math.PI / 2);
 }
 
+float rampWindow(int length, int index, int rampFrames) {
+  if (index < rampFrames)
+    return float(index) / rampFrames;
+  else if (length - index < rampFrames)
+    return float(length - index) / rampFrames;
+  else
+    return 1;
+}
+
 // Apply Hanning window over an array
 float[] applyWindow(float[] buf) {
   float[] buf2 = new float[buf.length];
   for (int i = 0; i < buf.length; i++) {
-    buf2[i] = buf[i] * hannWindow(buf.length, i);
+    //buf2[i] = buf[i] * hannWindow(buf.length, i);
+    buf2[i] = buf[i] * rampWindow(buf.length, i, 500);
   }
   return buf2;
 }
@@ -67,11 +77,14 @@ float[] trimToZeroCrossings(float[] array) {
 }
 
 
-float[] appendMirroredReverse(float[] array) {
+float[] appendMirroredReverse(float[] array, boolean reverse) {
   float[] array2 = new float[array.length*2];
   for (int i = 0; i < array.length; i++) {
     array2[i] = array[i];
-    array2[2*array.length - 1 - i] = -array[i];
+    if (reverse)
+      array2[2*array.length - 1 - i] = -array[i];
+    else
+      array2[2*array.length - 1 - i] = array[i];
   }
   return array2;
 } 
@@ -139,13 +152,13 @@ MultiChannelBuffer getSubBuffer(MultiChannelBuffer buf, int start, int length) {
   frames = trimToZeroCrossings(frames);
 //    if (c == 0) printArray("postTrim", frames, 5);
     
-  frames = appendMirroredReverse(frames);
 //    if (c == 0) printArray("apendReverse", frames, 5);
 
     //frames = ramp(frames, rampFrames);
 
- //     frames = applyWindow(frames);
+     frames = applyWindow(frames);
 
+  frames = appendMirroredReverse(frames, false);
     //frames = addBlanksBefore(frames, frames.length - 2*rampFrames);
 
     //if (firstClip)

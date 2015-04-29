@@ -1,21 +1,50 @@
+//////////// Start of parameters to edit ////////////
+static final int OSC_PORT = 8000;
+static final int NUM_X = 10;      // how many x sections in the instrument 
+static final int NUM_Y = 10;      // how many y sections in the instrument 
+static final boolean RECORD = true; // whether to record the audio and write to file on spacebar keypress
+
+public class GrainSynthSettings {
+  static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
+  static public final float ADSR_MIN_ATTACK_TIME = 0.25;     // function of 1/y
+  static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
+  static public final float ADSR_DECAY_TIME = 0.25;          // constant
+  static public final float ADSR_MIN_SUSTAIN_LEVEL = 0.25;   // constant
+  static public final float ADSR_MIN_RELEASE_TIME = 0.5;     // function of y
+  static public final float ADSR_MAX_RELEASE_TIME = 4;       // function of y
+
+  static public final int HIGH_PASS_MIN_FREQUENCY = 200;
+  static public final int HIGH_PASS_MAX_FREQUENCY = 4000;
+  static public final float LFO_AMPLITUDE = 0.2;       // the lfo range: percentage of the high pass frequency
+  static public final float LFO_FREQUENCY = 0.2;            // how fast does the LFO change
+}
+//////////// End of parameters to edit ////////////
+
+
+
+
+
+
+
+// features to add
+// * volume control on new node playing
+// * background ambient lower octave repeat of base track
+// * reverb
+
+
 import ddf.minim.*;
 import ddf.minim.ugens.*;
+import ddf.minim.UGen;
 import java.util.Arrays;
-
-// constants
-static int PORT = 8000;
-static int NUM_X = 10;      // how many x sections in the instrument 
-static int NUM_Y = 10;      // how many y sections in the instrument 
-static int XFADE_LENGTH = 1000;
 
 Minim minim;
 AudioOutput out;
-boolean pause = false;
+AudioRecorder recorder;
 
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
 
-OSCListener oscListener = new OSCListener(this, PORT);
+OSCListener oscListener = new OSCListener(this, OSC_PORT);
 
 // setup is run once at the beginning
 void setup()
@@ -29,12 +58,15 @@ void setup()
   // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
-  
+  recorder = minim.createRecorder(out, "arborealis-grain.wav");
+  recorder.beginRecord();
+
   // trigger the open file dialog or load the file directly
   //selectInput("Select an audio file:", "fileSelected");
   instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
 
-  //instruments[0].start(0, 5, 0, new GrainSynthNote(out, instruments[0].getSample(0)));
+  // debugging: play a note on startup
+  //instruments[0].start(1, 9, 0, new GrainSynthNote(out, instruments[0].getSample(1)));
 }
 
 // load a file from disk, split it evenly and create instruments from the samples
@@ -74,9 +106,6 @@ void fileSelected(File selection) {
 // draw the music visualizer to the screen
 void draw()
 {
-  if (pause)
-    return;
-    
   // erase the window to grey
   background( 192 );
   // draw using a black stroke
@@ -111,14 +140,9 @@ void oscEvent(OscMessage msg) {
 }
 
 void keyPressed() {
-  if (key == ' ')
-    pause = true;
-}
-
-void keyReleased() {
-  pause = false;
-} 
-  
-  
-
-  
+  if (key == ' ') {
+    recorder.endRecord();
+    recorder.save();
+    recorder.beginRecord();
+  }
+}  

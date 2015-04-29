@@ -1,24 +1,30 @@
-static class GrainSynthADSR {
-  public static float maxAmp(int y, float z, int numNotes) {
-    return 0.5;
+static class GrainSynthFuncs {
+  public static float adsrMaxAmp(int y, float z, int numNotes) {
+    return GrainSynthSettings.ADSR_MAX_AMPLITUDE;
   }
   
-  static float attackTime(int y, float z, int numNotes) {
-    return map(1.0 / y,  1.0/NUM_Y, 1.0, 0.25, 2.0);
+  static float adsrAttackTime(int y, float z, int numNotes) {
+    return map(1.0 / y,  1.0/NUM_Y, 1.0, GrainSynthSettings.ADSR_MIN_ATTACK_TIME, GrainSynthSettings.ADSR_MAX_ATTACK_TIME);
   }
 
-  static float decayTime(int y, float z, int numNotes) {
-    return 0.25;
+  static float adsrDecayTime(int y, float z, int numNotes) {
+    return GrainSynthSettings.ADSR_DECAY_TIME;
   }
   
-  static float sustainLevel(int y, float z, int numNotes) {
+  static float adsrSustainLevel(int y, float z, int numNotes) {
     //return log((1.0/numNotes) * ((y * 0.75) + 0.25));
-    return (y * 0.75) + 0.25;
+    return y * (1 - GrainSynthSettings.ADSR_MIN_SUSTAIN_LEVEL) + GrainSynthSettings.ADSR_MIN_SUSTAIN_LEVEL;
   }
   
-  static float releaseTime(int y, float z, int numNotes) {
-    return map(y, 1.0, NUM_Y, 0.5, 4);
+  static float adsrReleaseTime(int y, float z, int numNotes) {
+    return map(y, 1.0, NUM_Y, GrainSynthSettings.ADSR_MIN_RELEASE_TIME, GrainSynthSettings.ADSR_MAX_RELEASE_TIME);
   }    
+
+  static float highPassFreq(int y, float z, int numNotes) {
+    return constrain(map(numNotes, 1, NUM_X, 
+      GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY), 
+      GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY);
+  }
 }  
 
 
@@ -28,11 +34,13 @@ static class GrainSynthADSR {
 class GrainSynthNote implements ArborealisNote
 { 
   AudioOutput out;
-  SamplerXFade samp;            // the currently running sampler
+  Sampler samp;
+  ADSR adsr;
+  Oscil lfo;
+  MoogFilter highPass;
   MultiChannelBuffer buf;  // the input buffer containing the whole sample
   float duration;
-  ADSR adsr;
-  int x, y, numNotes;
+  int x, y;
   float z;
   
   // Create an instrument from an audio buffer
@@ -55,11 +63,10 @@ class GrainSynthNote implements ArborealisNote
   }
   
   // Start the Note.
-  void start(int _x, int _y, float _z, int _numNotes) {    
+  void start(int _x, int _y, float _z, int numNotes) {    
     x = _x;
     y = _y + 1;
     z = _z;
-    numNotes = _numNotes;
         
     if (samp != null) {
       println("Ignoring attempt to start grain synth while already playing");
@@ -73,30 +80,42 @@ class GrainSynthNote implements ArborealisNote
     MultiChannelBuffer buf2 = getSubBuffer(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
     
     // create a Sampler Ugen and turn on looping
-    samp = new SamplerXFade(buf2, 44100, 1, XFADE_LENGTH); 
+    samp = new Sampler(buf2, 44100, 1);
     samp.looping = true;
           
     // create the ASDR
-    adsr = new ADSR(GrainSynthADSR.maxAmp(y, z, numNotes), 
-                         GrainSynthADSR.attackTime(y, z, numNotes),
-                         GrainSynthADSR.decayTime(y, z, numNotes), 
-                         GrainSynthADSR.sustainLevel(y, z, numNotes),
-                         GrainSynthADSR.releaseTime(y, z, numNotes)); 
-    
-    RemoveClick removeClick = new RemoveClick(4096, 4);
+    adsr = new ADSR(GrainSynthFuncs.adsrMaxAmp(y, z, numNotes), 
+                    GrainSynthFuncs.adsrAttackTime(y, z, numNotes),
+                    GrainSynthFuncs.adsrDecayTime(y, z, numNotes), 
+                    GrainSynthFuncs.adsrSustainLevel(y, z, numNotes),
+                    GrainSynthFuncs.adsrReleaseTime(y, z, numNotes)); 
 
-    // send output of the Sampler into the output
-    //samp.patch( removeClick ).patch( adsr ).patch( out );
-    samp.patch( adsr ).patch( out );
-    
+    // create the LFO high pass filter
+    lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, 
+      GrainSynthFuncs.highPassFreq(y, z, numNotes) * GrainSynthSettings.LFO_AMPLITUDE, Waves.SINE);
+    lfo.offset.setLastValue(GrainSynthFuncs.highPassFreq(y, z, numNotes));
+    highPass = new MoogFilter(1, 0, MoogFilter.Type.HP);
+    lfo.patch(highPass.frequency);
+      
+    // send output of the Sampler through the high pass filter and adsr into the output
+    samp.patch(highPass).patch(adsr).patch(out);
+
     // start playing the Sampler Ugen and the ADSR envelope
     samp.trigger();
     adsr.noteOn();
   }
   
-  void update(int _numNotes) {
-    numNotes = _numNotes;
-    // FIX: update ADSR
+  void update(int numNotes) {
+    println("Updating note");
+    float hpFreq = GrainSynthFuncs.highPassFreq(y, z, numNotes);
+    lfo.amplitude.setLastValue(GrainSynthSettings.LFO_AMPLITUDE * hpFreq);
+    lfo.offset.setLastValue(hpFreq);
+
+    adsr.setParameters(GrainSynthFuncs.adsrMaxAmp(y,z,numNotes),
+                       GrainSynthFuncs.adsrAttackTime(y,z,numNotes),
+                       GrainSynthFuncs.adsrDecayTime(y,z,numNotes),
+                       GrainSynthFuncs.adsrSustainLevel(y,z,numNotes),
+                       GrainSynthFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
   }
   
 }
