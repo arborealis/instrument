@@ -26,6 +26,10 @@ static class GrainSynthFuncs {
     return map(numNotes, 1, NUM_X, 
       GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY);
   }
+
+  static float clipDuration(int y) {
+    return map(y, 1.0, NUM_Y, GrainSynthSettings.CLIP_MIN_FRACTIONAL_LENGTH, GrainSynthSettings.CLIP_MAX_FRACTIONAL_LENGTH);
+  }
 }  
 
 
@@ -77,7 +81,7 @@ class GrainSynthNote implements ArborealisNote
     println("Starting grain synth with duration: " + duration);
     
     // select the part of the sample we want to play
-    float duration = float(y) / NUM_Y;
+    float duration = GrainSynthFuncs.clipDuration(y);
     MultiChannelBuffer buf2 = getSubBuffer(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
     
     // create a Sampler Ugen and turn on looping

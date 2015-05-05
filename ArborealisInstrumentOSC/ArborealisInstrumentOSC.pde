@@ -16,8 +16,13 @@ public class GrainSynthSettings {
 
   static public final int HIGH_PASS_MIN_FREQUENCY = 200;
   static public final int HIGH_PASS_MAX_FREQUENCY = 4000;
-  static public final float LFO_AMPLITUDE = 0.2;       // the lfo range: percentage of the high pass frequency
-  static public final float LFO_FREQUENCY = 0.2;            // how fast does the LFO change
+  static public final float LFO_AMPLITUDE = 0.2;             // the lfo range: percentage of the high pass frequency
+  static public final float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
+
+  static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
+  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
+
+  static public final boolean USE_FILE_DIALOG = true;
 }
 //////////// End of parameters to edit ////////////
 
@@ -63,8 +68,10 @@ void setup()
   recorder.beginRecord();
 
   // trigger the open file dialog or load the file directly
-  //selectInput("Select an audio file:", "fileSelected");
-  instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
+  if (GrainSynthSettings.USE_FILE_DIALOG)
+    selectInput("Select an audio file:", "fileSelected");
+  else
+    instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
   instruments[1] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
   instruments[2] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
 
