@@ -22,7 +22,7 @@ public class GrainSynthSettings {
   static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
   static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
 
-  static public final boolean USE_FILE_DIALOG = true;
+  static public final boolean USE_FILE_DIALOG = false;
 }
 //////////// End of parameters to edit ////////////
 
