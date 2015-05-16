@@ -14,7 +14,7 @@ NetAddress sendAddress;
 void setup()
 {
   // call the draw() method at 30fps
-  frameRate(1);
+  frameRate(30);
   
   // create the graphics window
   size( 1200, 600, P2D );
@@ -32,23 +32,28 @@ void draw() {
   for (int y = 1; y < NUM_Y; y++)
     line(0, float(y)/NUM_Y*height, width, float(y)/NUM_Y*height);
 
-  String dataStr = new String();
-
   // generate one data point from the cell containing current mouse position
   int mx = int(float(mouseX) / width * NUM_X);
   int my = int(float(mouseY) / height * NUM_Y);
-  println("Mouse position: " + mx + " " + my);
+  //println("Mouse position: " + mx + " " + my);
+
+  // populate active cell as OSC string argument
+  String arg = new String();
   for (int i = 0; i < NUM_X * NUM_Y; i++) {
     if (i > 0)
-      dataStr += ",";
+      arg += ",";
 
     int x = i % NUM_X;
     int y = i / NUM_X;
     if (x == mx && y == my)
-      dataStr += "1";
+      arg += "1";
     else
-      dataStr += "0";
+      arg += "0";
   }
+
+  // populate active cell as OSC blob argument
+  // byte[] arg = new byte[NUM_X * NUM_Y]; // initialized to zero
+  // arg[mx + my * NUM_X] = byte(0xFF);
 
   // generate random data
   // for (int i = 0; i < NUM_X * NUM_Y; i++) {
@@ -57,9 +62,9 @@ void draw() {
   //   dataStr += nf(random(1), 1, 2);
   // }
 
-  println("Sending: " + dataStr);
+  //println("Sending: " + dataStr);
   OscMessage msg = new OscMessage("/A/C1");
-  msg.add(dataStr);
+  msg.add(arg);
   oscP5.send(msg, sendAddress); 
 }
 

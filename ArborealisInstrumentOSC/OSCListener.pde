@@ -63,7 +63,7 @@ class OSCListener implements OscEventListener {
         InstrumentType instrumentType = InstrumentType.grainsynth;
         ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
 
-        // convert to float
+        // parse input as string
         String str = args[0].stringValue();
         String[] strVals = str.split(",");
         assert(strVals.length == NUM_X * NUM_Y);
@@ -82,6 +82,24 @@ class OSCListener implements OscEventListener {
           }
         }
   
+        // // parse input as blob
+        // byte[] data = args[0].blobValue();
+        // assert(data.length == NUM_X * NUM_Y);
+        // //println("Received camera input: " + vals.length + " values");
+
+        // for (int i = 0; i < data.length; i++) {
+        //   int x = i % NUM_X;
+        //   int y = i / NUM_X;
+        //   float val = float(data[i]) / 255;
+
+        //   if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
+        //     if (val > 0)
+        //       instrument.activate(x, y, val, new GrainSynthNote(out, instrument.getSample(x)));
+        //     else
+        //       instrument.deactivate(x,y);
+        //   }
+        // }
+
         return true;
       } catch (IllegalArgumentException e) {
        return false;
