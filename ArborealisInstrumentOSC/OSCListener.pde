@@ -1,4 +1,3 @@
-import oscP5.*;
 import netP5.*;
 
 
@@ -14,30 +13,48 @@ class OSCListener {
   
 
   // update the state by parsing an OSC command
-  boolean updateState(NetAddress remoteAddress, String path, float[] args, ArborealisInstrument[] instruments) {
+  boolean updateState(NetAddress remoteAddress, String path, OscArgument[] args, ArborealisInstrument[] instruments) {
     this.remoteAddress = remoteAddress;
-    println("path: " + path);
+    //println("OSC message path: " + path);
     String[] tokens = path.split("/");
-    println("token1: " + tokens[1]);
+    //println("token1: " + tokens[1]);
     assert(tokens[0].equals(""));
     tokens = Arrays.copyOfRange(tokens, 1, tokens.length);
 
-    if (parseTouchOSCEvent(tokens, args))
+    if (parseTouchOSCEvent(tokens, args, instruments))
       return true;
 
-    if (parseCameraInput(tokens, args))
+    if (parseCameraInput(tokens, args, instruments))
       return true;
 
     return false;
   }
   
 
-  boolean parseCameraInput(String[] tokens, float[] args) {
+  boolean parseCameraInput(String[] tokens, OscArgument[] args, ArborealisInstrument[] instruments) {
+    if (tokens.length == 2 && args.length == 1) {
+
+      try {
+        // convert to float
+        String str = args[0].stringValue();
+        String[] strVals = str.split(",");
+        float[] vals = new float[strVals.length];
+        for (int i = 0; i < strVals.length; i++)
+          vals[i] = float(strVals[i]);
+  
+        //println("Received camera input: " + vals.length + " values");
+        assert(vals.length == NUM_X * NUM_Y);
+        return true;
+      } catch (IllegalArgumentException e) {
+       return false;
+      }
+    }
+
     return false;
   }
 
 
-  boolean parseTouchOSCEvent(String[] tokens, float[] args) {
+  boolean parseTouchOSCEvent(String[] tokens, OscArgument[] args, ArborealisInstrument[] instruments) {
     // ignore some commands
     if (tokens.length == 1 && (tokens[0].equals("1") || tokens[0].equals("2") || tokens[0].equals("3") || tokens[0].equals("4")))
       return true;
@@ -61,13 +78,13 @@ class OSCListener {
         println("cmd: " + cmd);
         int y = int(tokens[2]) - 1;     
         int x = int(tokens[3]) - 1;
-        println("x: " + x + " y: " + y + " val: " + args[0]);
+        println("x: " + x + " y: " + y + " val: " + args[0].floatValue());
    
         y *= 2; // The TouchOSC keyboard only has 5 y values to extend its range
         
         assert(x >=0 && x <= NUM_X);
         assert(y >=0 && y <= NUM_Y);
-        boolean on = args[0] != 0;
+        boolean on = args[0].floatValue() != 0;
         
         if (!cmd.equals("setone"))
           return false;

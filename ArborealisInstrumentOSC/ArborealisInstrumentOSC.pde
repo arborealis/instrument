@@ -1,7 +1,7 @@
 //////////// Start of parameters to edit ////////////
-static final int OSC_RECEIVE_PORT = 8000;
+static final int OSC_RECEIVE_PORT = 7000;
 static final int OSC_SEND_PORT = 9000;
-static final int NUM_X = 10;      // how many x sections in the instrument 
+static final int NUM_X = 20;      // how many x sections in the instrument 
 static final int NUM_Y = 10;      // how many y sections in the instrument 
 static final boolean RECORD = true; // whether to record the audio and write to file on spacebar keypress
 
@@ -42,6 +42,7 @@ import ddf.minim.*;
 import ddf.minim.ugens.*;
 import ddf.minim.UGen;
 import java.util.Arrays;
+import oscP5.*;
 
 Minim minim;
 AudioOutput out;
@@ -134,13 +135,13 @@ void draw()
 
 // handler managed by OscP5 that listens to OSC messages
 void oscEvent(OscMessage msg) {
-  println("Received osc message: " + msg.toString());
+  //println("Received osc message: " + msg.toString());
 
-  // parse args; currently we expect all floats
-  float[] args = new float[msg.arguments().length];
+  // get args
+  OscArgument[] args = new OscArgument[msg.arguments().length];
   for (int i = 0; i < msg.arguments().length; i++)
-    args[i] = msg.get(i).floatValue();
-    
+    args[i] = msg.get(i);
+
   // check for incoming OSC messages and update the instruments' states
   boolean valid = oscListener.updateState(msg.netAddress(), msg.addrPattern(), args, instruments);
       
