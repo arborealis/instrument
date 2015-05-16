@@ -23,6 +23,7 @@ class ArborealisInstrument {
   }
  
   void updateAll() {
+    println("INSTRUMENT: updating notes");
     for (int x = 0; x < NUM_X; x++)
       for (int y = 0; y < NUM_Y; y++)
         if (notes[x][y] != null)
@@ -45,11 +46,12 @@ class ArborealisInstrument {
   }
   
   void deactivate(int x, int y) {
-    if (notes[x][y] != null) {
-      activeCount--;
-      notes[x][y].stop();
-      notes[x][y] = null;
-    }
+    if (notes[x][y] == null) 
+      return;
+
+    activeCount--;
+    notes[x][y].stop();
+    notes[x][y] = null;
     updateAll();
   }
 }

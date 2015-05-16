@@ -14,18 +14,24 @@ class OSCListener implements OscEventListener {
 
   // called behind the scenes by oscP5
   void oscEvent(OscMessage msg) {
-    OscArgument[] args = new OscArgument[msg.arguments().length];
-    for (int i = 0; i < msg.arguments().length; i++)
-      args[i] = msg.get(i);
+    try {
+      OscArgument[] args = new OscArgument[msg.arguments().length];
+      for (int i = 0; i < msg.arguments().length; i++)
+        args[i] = msg.get(i);
 
-    // store the remote address for sending unsolicited messages to
-    remoteAddress = msg.netAddress();
+      // store the remote address for sending unsolicited messages to
+      remoteAddress = msg.netAddress();
 
-    // check for incoming OSC messages and update the instruments' states
-    boolean valid = updateState(msg.addrPattern(), args);
-        
-    if (!valid) {
-      println("OSC: Invalid message=" + msg.toString());
+      // check for incoming OSC messages and update the instruments' states
+      boolean valid = updateState(msg.addrPattern(), args);
+          
+      if (!valid) {
+        println("OSC: Invalid message=" + msg.toString());
+      }
+    } catch (Exception e) {
+      println("OSC: exception=" + e);
+      for (StackTraceElement elem : e.getStackTrace())
+        println("    " + elem);
     }
   }
 
@@ -53,10 +59,10 @@ class OSCListener implements OscEventListener {
 
   boolean parseCameraInput(String[] tokens, OscArgument[] args, ArborealisInstrument[] instruments) {
     if (tokens.length == 2 && args.length == 1) {
-      InstrumentType instrumentType = InstrumentType.grainsynth;
-      ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
-
       try {
+        InstrumentType instrumentType = InstrumentType.grainsynth;
+        ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
+
         // convert to float
         String str = args[0].stringValue();
         String[] strVals = str.split(",");
@@ -65,7 +71,7 @@ class OSCListener implements OscEventListener {
 
         for (int i = 0; i < strVals.length; i++) {
           int x = i % NUM_X;
-          int y = i / NUM_Y;
+          int y = i / NUM_X;
           float val = float(strVals[i]);
 
           if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far

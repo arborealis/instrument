@@ -62,11 +62,6 @@ void setup()
   // create the graphics window
   size( 512, 200, P2D );
   
-  // start the osc server
-  oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
-  OSCListener list = new OSCListener(oscP5, instruments);
-  oscP5.addListener(list);  
-
   // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
@@ -80,6 +75,11 @@ void setup()
     instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
   instruments[1] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
   instruments[2] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
+
+  // start the osc server
+  oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
+  OSCListener list = new OSCListener(oscP5, instruments);
+  oscP5.addListener(list);  
 
   // debugging: play a note on startup
   //instruments[0].start(1, 9, 0, new GrainSynthNote(out, instruments[0].getSample(1)));

@@ -78,12 +78,12 @@ class GrainSynthNote implements ArborealisNote
       return;
     }
       
-    println("NOTE: Starting grain synth at (" + x + "," + y + ") with duration: " + duration);
-    
     // select the part of the sample we want to play
     float duration = GrainSynthFuncs.clipDuration(y);
     MultiChannelBuffer buf2 = getSubBuffer(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
-    
+
+    println("NOTE: Starting grain synth at (" + x + "," + y + ") with duration: " + duration);
+        
     // create a Sampler Ugen and turn on looping
     samp = new Sampler(buf2, 44100, 1);
     samp.looping = true;
@@ -111,7 +111,7 @@ class GrainSynthNote implements ArborealisNote
   }
   
   void update(int numNotes) {
-    println("Updating note");
+    //println("NOTE: Updating note");
     float hpFreq = GrainSynthFuncs.highPassFreq(y, z, numNotes);
     lfo.amplitude.setLastValue(GrainSynthSettings.LFO_AMPLITUDE * hpFreq);
     lfo.offset.setLastValue(hpFreq);
