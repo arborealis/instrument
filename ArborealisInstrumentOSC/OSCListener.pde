@@ -2,19 +2,39 @@ import netP5.*;
 
 
 // Manage parsing of OSC messages
-class OSCListener {
+class OSCListener implements OscEventListener {
   OscP5 oscP5;
   NetAddress remoteAddress;
+  ArborealisInstrument[] instruments;
   
-  OSCListener(Object theParent, int port) {
-    // start the osc server listening for incoming messages
-    oscP5 = new OscP5(theParent, port);
+  OSCListener(OscP5 oscP5, ArborealisInstrument[] instruments) {
+    this.oscP5 = oscP5;
+    this.instruments = instruments;
   }
-  
+
+  // called behind the scenes by oscP5
+  void oscEvent(OscMessage msg) {
+    OscArgument[] args = new OscArgument[msg.arguments().length];
+    for (int i = 0; i < msg.arguments().length; i++)
+      args[i] = msg.get(i);
+
+    // store the remote address for sending unsolicited messages to
+    remoteAddress = msg.netAddress();
+
+    // check for incoming OSC messages and update the instruments' states
+    boolean valid = updateState(msg.addrPattern(), args);
+        
+    if (!valid) {
+      println("OSC: Invalid message=" + msg.toString());
+    }
+  }
+
+  void oscStatus(OscStatus theStatus) {
+    println("OSC: status=" + theStatus.id());
+  }  
 
   // update the state by parsing an OSC command
-  boolean updateState(NetAddress remoteAddress, String path, OscArgument[] args, ArborealisInstrument[] instruments) {
-    this.remoteAddress = remoteAddress;
+  boolean updateState(String path, OscArgument[] args) {
     //println("OSC message path: " + path);
     String[] tokens = path.split("/");
     //println("token1: " + tokens[1]);
@@ -33,17 +53,29 @@ class OSCListener {
 
   boolean parseCameraInput(String[] tokens, OscArgument[] args, ArborealisInstrument[] instruments) {
     if (tokens.length == 2 && args.length == 1) {
+      InstrumentType instrumentType = InstrumentType.grainsynth;
+      ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
 
       try {
         // convert to float
         String str = args[0].stringValue();
         String[] strVals = str.split(",");
-        float[] vals = new float[strVals.length];
-        for (int i = 0; i < strVals.length; i++)
-          vals[i] = float(strVals[i]);
-  
+        assert(strVals.length == NUM_X * NUM_Y);
         //println("Received camera input: " + vals.length + " values");
-        assert(vals.length == NUM_X * NUM_Y);
+
+        for (int i = 0; i < strVals.length; i++) {
+          int x = i % NUM_X;
+          int y = i / NUM_Y;
+          float val = float(strVals[i]);
+
+          if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
+            if (val > 0)
+              instrument.activate(x, y, val, new GrainSynthNote(out, instrument.getSample(x)));
+            else
+              instrument.deactivate(x,y);
+          }
+        }
+  
         return true;
       } catch (IllegalArgumentException e) {
        return false;
@@ -72,15 +104,15 @@ class OSCListener {
     if (tokens.length == 4 && args.length == 1) {
       try {                      
         InstrumentType instrumentType = InstrumentType.valueOf(tokens[0]);
-        println("instrument: " + instrumentType);
+        //println("instrument: " + instrumentType);
         ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
         String cmd = tokens[1]; 
-        println("cmd: " + cmd);
+        //println("cmd: " + cmd);
         int y = int(tokens[2]) - 1;     
         int x = int(tokens[3]) - 1;
-        println("x: " + x + " y: " + y + " val: " + args[0].floatValue());
    
         y *= 2; // The TouchOSC keyboard only has 5 y values to extend its range
+        //println("x: " + x + " y: " + y + " val: " + args[0].floatValue());
         
         assert(x >=0 && x <= NUM_X);
         assert(y >=0 && y <= NUM_Y);
@@ -89,13 +121,13 @@ class OSCListener {
         if (!cmd.equals("setone"))
           return false;
 
-        println("setone: instrument=" + instrumentType.ordinal() + ", x=" + x + ", y=" + y + ", state=" + on);
+        println("OSC: TouchOSC event instrument=" + instrumentType.ordinal() + ", x=" + x + ", y=" + y + ", state=" + on);
         
         if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
           if (on)
-            instrument.start(x, y, 0, new GrainSynthNote(out, instrument.getSample(x)));
+            instrument.activate(x, y, 0, new GrainSynthNote(out, instrument.getSample(x)));
           else
-            instrument.stop(x,y);
+            instrument.deactivate(x,y);
         }
 
         return true;
@@ -121,7 +153,7 @@ class OSCListener {
             msg.add(y);
             msg.add(0);
             println("Sending: " + msg.toString()); 
-            this.oscP5.send(msg, address2);
+            oscP5.send(msg, address2);
           }
         }
   }  

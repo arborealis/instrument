@@ -1,6 +1,6 @@
 //////////// Start of parameters to edit ////////////
 static final int OSC_RECEIVE_PORT = 7000;
-static final int OSC_SEND_PORT = 9000;
+static final int OSC_SEND_PORT = 8000;
 static final int NUM_X = 20;      // how many x sections in the instrument 
 static final int NUM_Y = 10;      // how many y sections in the instrument 
 static final boolean RECORD = true; // whether to record the audio and write to file on spacebar keypress
@@ -51,7 +51,7 @@ AudioRecorder recorder;
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
 
-OSCListener oscListener = new OSCListener(this, OSC_RECEIVE_PORT);
+OscP5 oscP5;
 
 // setup is run once at the beginning
 void setup()
@@ -62,6 +62,11 @@ void setup()
   // create the graphics window
   size( 512, 200, P2D );
   
+  // start the osc server
+  oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
+  OSCListener list = new OSCListener(oscP5, instruments);
+  oscP5.addListener(list);  
+
   // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
@@ -131,23 +136,6 @@ void draw()
     line( x1, 50 + out.left.get(i)*50, x2, 50 + out.left.get(i+1)*50);
     line( x1, 150 + out.right.get(i)*50, x2, 150 + out.right.get(i+1)*50);
   }  
-}
-
-// handler managed by OscP5 that listens to OSC messages
-void oscEvent(OscMessage msg) {
-  //println("Received osc message: " + msg.toString());
-
-  // get args
-  OscArgument[] args = new OscArgument[msg.arguments().length];
-  for (int i = 0; i < msg.arguments().length; i++)
-    args[i] = msg.get(i);
-
-  // check for incoming OSC messages and update the instruments' states
-  boolean valid = oscListener.updateState(msg.netAddress(), msg.addrPattern(), args, instruments);
-      
-  if (!valid) {
-    println("Invalid osc message: " + msg.toString());
-  }
 }
 
 void keyPressed() {

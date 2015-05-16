@@ -58,7 +58,7 @@ class GrainSynthNote implements ArborealisNote
 
   void stop() {
     if (samp != null) {
-      println("Stopping grain synth");
+      println("NOTE: Stopping grain synth at (" + x + "," + y + ")");
       
       adsr.unpatchAfterRelease(out);
       adsr.noteOff();
@@ -78,7 +78,7 @@ class GrainSynthNote implements ArborealisNote
       return;
     }
       
-    println("Starting grain synth with duration: " + duration);
+    println("NOTE: Starting grain synth at (" + x + "," + y + ") with duration: " + duration);
     
     // select the part of the sample we want to play
     float duration = GrainSynthFuncs.clipDuration(y);

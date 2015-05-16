@@ -71,7 +71,7 @@ int findZeroCrossing(float[] array, boolean front, int offset) {
 float[] trimToZeroCrossings(float[] array) {
   int start = findZeroCrossing(array, true, 0);
   int end = findZeroCrossing(array, false, 0);
-  println("trimtoZC start=" + start + " end=" + end + " length=" + array.length);
+  //println("trimtoZC start=" + start + " end=" + end + " length=" + array.length);
   
   return Arrays.copyOfRange(array, start, end);
 }

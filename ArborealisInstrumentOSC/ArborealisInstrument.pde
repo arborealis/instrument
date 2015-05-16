@@ -33,17 +33,18 @@ class ArborealisInstrument {
     return bufs[x];
   }
   
-  void start(int x, int y, float z, ArborealisNote note) {
-    assert(notes[x][y] == null);
-    activeCount++;
+  void activate(int x, int y, float z, ArborealisNote note) {
+    if (notes[x][y] != null)
+      return;
 
+    activeCount++;
     updateAll();
 
     note.start(x, y, z, activeCount);
     notes[x][y] = note;
   }
   
-  void stop(int x, int y) {
+  void deactivate(int x, int y) {
     if (notes[x][y] != null) {
       activeCount--;
       notes[x][y].stop();
