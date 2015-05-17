@@ -5,7 +5,11 @@ static final int OSC_RECEIVE_PORT = 8000;
 static final int OSC_SEND_PORT = 7000;
 static final int NUM_X = 20;
 static final int NUM_Y = 10;
-
+static final int NUM_INST = 3;
+static final int WIDTH = 1400;
+static final int CELL_SIZE = WIDTH / NUM_INST / (NUM_X + 1);
+static final int BORDER = CELL_SIZE;
+static final int GRID_WIDTH = WIDTH / NUM_INST - BORDER;
 
 OscP5 oscP5;
 NetAddress sendAddress;
@@ -17,7 +21,7 @@ void setup()
   frameRate(30);
   
   // create the graphics window
-  size( 1200, 600, P2D );
+  size( WIDTH, WIDTH/NUM_INST*NUM_Y/NUM_X, P2D );
 
   oscP5 = new OscP5(this,OSC_RECEIVE_PORT);
   sendAddress = new NetAddress("127.0.0.1",OSC_SEND_PORT);  
@@ -26,16 +30,22 @@ void setup()
 void draw() {
   background(0); 
 
-  stroke(255,255,255);
-  for (int x = 1; x < NUM_X; x++)
-    line(float(x)/NUM_X*width, 0, float(x)/NUM_X*width, height);
-  for (int y = 1; y < NUM_Y; y++)
-    line(0, float(y)/NUM_Y*height, width, float(y)/NUM_Y*height);
+  for (int i = 0; i < NUM_INST; i++) {
+    stroke(255,255,255);
+    for (int x = 0; x <= NUM_X; x++) {
+      float xx = float(x)/NUM_X*GRID_WIDTH + GRID_WIDTH*i + BORDER*i;
+      line(xx, 0, xx, height);
+    }
+    for (int y = 0; y <= NUM_Y; y++) {
+      line(i*GRID_WIDTH+BORDER*i, float(y)/NUM_Y*height, (i+1)*GRID_WIDTH+BORDER*i, float(y)/NUM_Y*height);
+    }
+  }
 
   // generate one data point from the cell containing current mouse position
-  int mx = int(float(mouseX) / width * NUM_X);
+  int instrument = mouseX / (width / NUM_INST);
+  int mx = (mouseX * (NUM_X+1) / (width / NUM_INST)) % (NUM_X+1);
   int my = NUM_Y - 1 - int(float(mouseY) / height * NUM_Y); // flip y axis
-  //println("Mouse position: " + mx + " " + my);
+  //println("Mouse position: instrument=" + instrument + " mx=" + mx + " my=" + my);
 
   // populate active cell as OSC string argument
   String arg = new String();
@@ -63,7 +73,7 @@ void draw() {
   // }
 
   //println("Sending: " + dataStr);
-  OscMessage msg = new OscMessage("/A/C1");
+  OscMessage msg = new OscMessage("/A/C" + instrument);
   msg.add(arg);
   oscP5.send(msg, sendAddress); 
 }
