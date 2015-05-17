@@ -1,3 +1,5 @@
+// Main file for the ArborealisInstrumentOSC sketch
+
 // Settings to customize can be found in Settings.pde
 
 // features to add
@@ -14,7 +16,7 @@ import oscP5.*;
 
 Minim minim;
 AudioOutput out;
-AudioRecorder recorder;
+AudioRecorder recorder = null;
 
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
@@ -38,13 +40,11 @@ void setup()
   // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
   out = minim.getLineOut( Minim.MONO, 2048 );  
-  recorder = minim.createRecorder(out, "arborealis-grain.wav");
-  recorder.beginRecord();
 
   // trigger the open file dialog or load the files directly
   for (InstrumentType instrumentType : InstrumentType.values()) {
     InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
-    if (settings.useFile == null)
+    if (settings.useFile.equals(""))
       selectInput("Select an audio file to use for the '" + instrumentType + "'", "create_" + instrumentType);
     else
       create_instrument(instrumentType, new File(sketchPath(settings.useFile)));
@@ -130,8 +130,15 @@ void draw()
 
 void keyPressed() {
   if (key == ' ') {
-    recorder.endRecord();
-    recorder.save();
+    if (recorder == null)
+      recorder = minim.createRecorder(out, "arborealis-recorded.wav");      
+    else {
+      recorder.endRecord();
+      recorder.save();
+      println("RECORD: file saved");
+    }
+
     recorder.beginRecord();
+    println("RECORD: started");
   }
 }  
