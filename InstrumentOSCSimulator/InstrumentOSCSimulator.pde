@@ -34,7 +34,7 @@ void draw() {
 
   // generate one data point from the cell containing current mouse position
   int mx = int(float(mouseX) / width * NUM_X);
-  int my = int(float(mouseY) / height * NUM_Y);
+  int my = NUM_Y - 1 - int(float(mouseY) / height * NUM_Y); // flip y axis
   //println("Mouse position: " + mx + " " + my);
 
   // populate active cell as OSC string argument
