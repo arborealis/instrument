@@ -2,7 +2,7 @@ ArborealisInstrument instrumentFactory(InstrumentType instrumentType, String fil
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
   if (instrumentType == InstrumentType.grainsynth)
-    return new ArborealisInstrument(parseSampleFile(filename));
+    return new ArborealisInstrument(instrumentType, parseSampleFile(filename));
   else if (instrumentType == InstrumentType.keyboard)
     return new KeyboardInstrument(parseSampleFile(filename));
   else if (instrumentType == InstrumentType.arpeggio)
@@ -17,9 +17,11 @@ class ArborealisInstrument {
   protected ArborealisNote[][] notes;
   protected MultiChannelBuffer[] bufs;
   protected int activeCount = 0;
+  protected InstrumentType type;
 
-  ArborealisInstrument(MultiChannelBuffer[] bufs) {
+  ArborealisInstrument(InstrumentType type, MultiChannelBuffer[] bufs) {
     this.bufs = bufs;
+    this.type = type;
     notes = new ArborealisNote[NUM_X][NUM_Y];
   }
   
@@ -68,5 +70,9 @@ class ArborealisInstrument {
     updateAll();
   }
 
-  int activeCount() { return activeCount; }
+  int numNotes() { return activeCount; }
+
+  void trigger() {}
+
+  InstrumentType type() { return type; }
 }

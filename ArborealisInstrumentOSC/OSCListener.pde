@@ -14,6 +14,8 @@ class OSCListener implements OscEventListener {
 
   // called behind the scenes by oscP5
   void oscEvent(OscMessage msg) {
+    println("OSC: received message=" + msg.toString());
+    
     try {
       OscArgument[] args = new OscArgument[msg.arguments().length];
       for (int i = 0; i < msg.arguments().length; i++)
@@ -60,8 +62,9 @@ class OSCListener implements OscEventListener {
   boolean parseCameraInput(String[] tokens, OscArgument[] args, ArborealisInstrument[] instruments) {
     if (tokens.length == 2 && args.length == 1) {
       try {
-        InstrumentType instrumentType = InstrumentType.grainsynth;
-        ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
+        int instrumentId = int(tokens[1].substring(1)) - 1;
+        assert(instrumentId >= 0 && instrumentId < instruments.length);
+        ArborealisInstrument instrument = instruments[instrumentId];
 
         // check if we've initialized the instrument yet
         if (instrument == null)
@@ -76,14 +79,12 @@ class OSCListener implements OscEventListener {
         for (int i = 0; i < strVals.length; i++) {
           int x = i % NUM_X;
           int y = i / NUM_X;
-          float val = float(strVals[i]);
+          float z = float(strVals[i]);
 
-          if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
-            if (val > 0)
-              instrument.activate(x, y, val, new GrainSynthNote(out, x, y, val, instrument.activeCount(), instrument.getSample(x)));
-            else
-              instrument.deactivate(x,y);
-          }
+          if (z > 0)
+            instrument.activate(x, y, z, noteFactory(out, instrument, x, y, z));
+          else
+            instrument.deactivate(x, y);
         }
   
         // // parse input as blob
@@ -155,12 +156,10 @@ class OSCListener implements OscEventListener {
 
         println("OSC: TouchOSC event instrument=" + instrumentType.ordinal() + ", x=" + x + ", y=" + y + ", state=" + on);
         
-        if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
-          if (on)
-            instrument.activate(x, y, 0, new GrainSynthNote(out, x, y, 0, instrument.activeCount(), instrument.getSample(x)));
-          else
-            instrument.deactivate(x,y);
-        }
+        if (on)
+          instrument.activate(x, y, 1, noteFactory(out, instrument, x, y, 1));
+        else
+          instrument.deactivate(x, y);
 
         return true;
       } catch (IllegalArgumentException e) {

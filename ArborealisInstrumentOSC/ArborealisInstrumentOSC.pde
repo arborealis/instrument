@@ -17,6 +17,7 @@ import oscP5.*;
 Minim minim;
 AudioOutput out;
 AudioRecorder recorder = null;
+int lastBeatTime = millis();
 
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
@@ -59,34 +60,6 @@ void setup()
   //instruments[0].start(1, 9, 0, new GrainSynthNote(out, instruments[0].getSample(1)));
 }
 
-// load a file from disk, split it evenly and create instruments from the samples
-// TODO: allow splitting based on returns to zero (RTZ)
-MultiChannelBuffer[] parseSampleFile(String filename) {  
-  MultiChannelBuffer[] bufs = new MultiChannelBuffer[NUM_X];
-  
-  // load sample
-  MultiChannelBuffer mainBuf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
-  minim.loadFileIntoBuffer(filename, mainBuf);
-  
-  // split sample into sub-samples of equal size
-  int nfTot = mainBuf.getBufferSize();
-  int nfSub = nfTot/NUM_X;  
-  int nc = mainBuf.getChannelCount();
-  println("# Sample frames: " + nfTot);
-  println("# Sub-sample frames: " + nfSub);
-
-  // Split the main sample buffer into sub-samples
-  for (int s = 0; s < NUM_X; s++) {
-    bufs[s] = new MultiChannelBuffer(nfSub, nc);
-    for (int c = 0; c < nc; c++) {
-      float[] frames = mainBuf.getChannel(c);
-      float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
-      bufs[s].setChannel(c, subFrames);
-    }
-  }
-  
-  return bufs;
-}
 
 // Create an instrument of the given type from a file
 void create_instrument(InstrumentType instrumentType, File file) {
@@ -109,9 +82,21 @@ void create_arpeggio(File file) {
   create_instrument(InstrumentType.arpeggio, file);
 }
  
+
+void triggerBeat() {
+  for (ArborealisInstrument instrument : instruments)
+    if (instrument != null) // if it's been initialized
+      instrument.trigger();
+}
+
 // draw the music visualizer to the screen
 void draw()
 {
+  if (millis() - lastBeatTime >= 60000 / BPM) {
+    triggerBeat();
+    lastBeatTime = millis();
+  }
+
   // erase the window to grey
   background( 192 );
   // draw using a black stroke

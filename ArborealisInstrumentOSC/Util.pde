@@ -1,3 +1,33 @@
+
+// load a file from disk, split it evenly and create instruments from the samples
+MultiChannelBuffer[] parseSampleFile(String filename) {  
+  MultiChannelBuffer[] bufs = new MultiChannelBuffer[NUM_X];
+  
+  // load sample
+  MultiChannelBuffer mainBuf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
+  minim.loadFileIntoBuffer(filename, mainBuf);
+  
+  // split sample into sub-samples of equal size
+  int nfTot = mainBuf.getBufferSize();
+  int nfSub = nfTot/NUM_X;  
+  int nc = mainBuf.getChannelCount();
+  println("# Sample frames: " + nfTot);
+  println("# Sub-sample frames: " + nfSub);
+
+  // Split the main sample buffer into sub-samples
+  for (int s = 0; s < NUM_X; s++) {
+    bufs[s] = new MultiChannelBuffer(nfSub, nc);
+    for (int c = 0; c < nc; c++) {
+      float[] frames = mainBuf.getChannel(c);
+      float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
+      bufs[s].setChannel(c, subFrames);
+    }
+  }
+  
+  return bufs;
+}
+
+
 /////// Some Window functions for smoothing the transition between starting/stopping the sample 
 /////// http://en.wikipedia.org/wiki/Window_function#Generalized_Hamming_windows
 
