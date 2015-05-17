@@ -1,13 +1,26 @@
-import java.util.*;
+ArborealisInstrument instrumentFactory(InstrumentType instrumentType, String filename) {
+  InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
+
+  if (instrumentType == InstrumentType.grainsynth)
+    return new ArborealisInstrument(parseSampleFile(filename));
+  else if (instrumentType == InstrumentType.keyboard)
+    return new KeyboardInstrument(parseSampleFile(filename));
+  else if (instrumentType == InstrumentType.arpeggio)
+    return new KeyboardInstrument(parseSampleFile(filename));
+  else
+    assert(false);
+  return null;
+}
 
 // keep track of all notes being played by an instrument: where each xy space maps to one possible note
 class ArborealisInstrument {
-  private ArborealisNote[][] notes = new ArborealisNote[NUM_X][NUM_Y];
-  private MultiChannelBuffer[] bufs;
-  int activeCount = 0;
-  
+  protected ArborealisNote[][] notes;
+  protected MultiChannelBuffer[] bufs;
+  protected int activeCount = 0;
+
   ArborealisInstrument(MultiChannelBuffer[] bufs) {
     this.bufs = bufs;
+    notes = new ArborealisNote[NUM_X][NUM_Y];
   }
   
   // stop all instruments
@@ -41,7 +54,7 @@ class ArborealisInstrument {
     activeCount++;
     updateAll();
 
-    note.start(x, y, z, activeCount);
+    note.start();
     notes[x][y] = note;
   }
   
@@ -54,4 +67,6 @@ class ArborealisInstrument {
     notes[x][y] = null;
     updateAll();
   }
+
+  int activeCount() { return activeCount; }
 }

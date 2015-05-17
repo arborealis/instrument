@@ -45,14 +45,19 @@ class GrainSynthNote implements ArborealisNote
   MoogFilter highPass;
   MultiChannelBuffer buf;  // the input buffer containing the whole sample
   float duration;
-  int x, y;
+  int x, y, numNotes;
   float z;
+
   
   // Create an instrument from an audio buffer
-  GrainSynthNote(AudioOutput _out, MultiChannelBuffer _buf)
+  GrainSynthNote(AudioOutput out, int x, int y, float z, int numNotes, MultiChannelBuffer buf)
   { 
-    out = _out;
-    buf = _buf;
+    this.out = out;
+    this.buf = buf;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.numNotes = numNotes;
     samp = null;
   }
 
@@ -68,11 +73,7 @@ class GrainSynthNote implements ArborealisNote
   }
   
   // Start the Note.
-  void start(int _x, int _y, float _z, int numNotes) {    
-    x = _x;
-    y = _y + 1;
-    z = _z;
-        
+  void start() {    
     if (samp != null) {
       println("Ignoring attempt to start grain synth while already playing");
       return;

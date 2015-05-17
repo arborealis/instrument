@@ -1,42 +1,9 @@
-//////////// Start of parameters to edit ////////////
-static final int OSC_RECEIVE_PORT = 7000;
-static final int OSC_SEND_PORT = 8000;
-static final int NUM_X = 20;      // how many x sections in the instrument 
-static final int NUM_Y = 10;      // how many y sections in the instrument 
-static final boolean RECORD = true; // whether to record the audio and write to file on spacebar keypress
-
-public class GrainSynthSettings {
-  static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
-  static public final float ADSR_MIN_ATTACK_TIME = 0.25;     // function of 1/y
-  static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
-  static public final float ADSR_DECAY_TIME = 0.25;          // constant
-  static public final float ADSR_MIN_SUSTAIN_LEVEL = 0.25;   // constant
-  static public final float ADSR_MIN_RELEASE_TIME = 0.5;     // function of y
-  static public final float ADSR_MAX_RELEASE_TIME = 4;       // function of y
-
-  static public final int HIGH_PASS_MIN_FREQUENCY = 200;
-  static public final int HIGH_PASS_MAX_FREQUENCY = 4000;
-  static public final float LFO_AMPLITUDE = 0.2;             // the lfo range: percentage of the high pass frequency
-  static public final float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
-
-  static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
-  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
-
-  static public final boolean USE_FILE_DIALOG = false;
-}
-//////////// End of parameters to edit ////////////
-
-
-
-
-
-
+// Settings to customize can be found in Settings.pde
 
 // features to add
 // * volume control on new node playing
 // * background ambient lower octave repeat of base track
 // * reverb
-
 
 import ddf.minim.*;
 import ddf.minim.ugens.*;
@@ -44,12 +11,18 @@ import ddf.minim.UGen;
 import java.util.Arrays;
 import oscP5.*;
 
+
 Minim minim;
 AudioOutput out;
 AudioRecorder recorder;
 
 // array storing the instruments
 ArborealisInstrument[] instruments = new ArborealisInstrument[InstrumentType.values().length];
+
+InstrumentSettings[] instrumentSettings = new InstrumentSettings[] 
+  { new InstrumentSettings(GrainSynthSettings.USE_FILE), 
+    new InstrumentSettings(KeyboardSettings.USE_FILE), 
+    new InstrumentSettings(ArpeggioSettings.USE_FILE) };
 
 OscP5 oscP5;
 
@@ -68,13 +41,14 @@ void setup()
   recorder = minim.createRecorder(out, "arborealis-grain.wav");
   recorder.beginRecord();
 
-  // trigger the open file dialog or load the file directly
-  if (GrainSynthSettings.USE_FILE_DIALOG)
-    selectInput("Select an audio file:", "fileSelected");
-  else
-    instruments[0] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
-  instruments[1] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
-  instruments[2] = new ArborealisInstrument(parseSampleFile("../samples/GRAIN_MONO.wav"));
+  // trigger the open file dialog or load the files directly
+  for (InstrumentType instrumentType : InstrumentType.values()) {
+    InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
+    if (settings.useFile == null)
+      selectInput("Select an audio file to use for the '" + instrumentType + "'", "create_" + instrumentType);
+    else
+      create_instrument(instrumentType, new File(sketchPath(settings.useFile)));
+  }
 
   // start the osc server
   oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
@@ -114,9 +88,25 @@ MultiChannelBuffer[] parseSampleFile(String filename) {
   return bufs;
 }
 
+// Create an instrument of the given type from a file
+void create_instrument(InstrumentType instrumentType, File file) {
+  if (file.exists()) {
+    println("Creating instrument " + instrumentType + " from file: " + file.getPath());
+    instruments[instrumentType.ordinal()] = instrumentFactory(instrumentType, file.getPath());
+  } else {
+    println("ERROR: unable to open sound file: " + file.getPath());;
+  }
+}
+
 // This code is called by the selectInput() method when a file has been selected
-void fileSelected(File selection) {  
-  instruments[0] = new ArborealisInstrument(parseSampleFile(selection.getAbsolutePath()));
+void create_grainsynth(File file) {
+  create_instrument(InstrumentType.grainsynth, file);
+}
+void create_keyboard(File file) {
+  create_instrument(InstrumentType.keyboard, file);
+}
+void create_arpeggio(File file) {
+  create_instrument(InstrumentType.arpeggio, file);
 }
  
 // draw the music visualizer to the screen

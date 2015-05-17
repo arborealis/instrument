@@ -63,6 +63,10 @@ class OSCListener implements OscEventListener {
         InstrumentType instrumentType = InstrumentType.grainsynth;
         ArborealisInstrument instrument = instruments[instrumentType.ordinal()];
 
+        // check if we've initialized the instrument yet
+        if (instrument == null)
+          return true;
+
         // parse input as string
         String str = args[0].stringValue();
         String[] strVals = str.split(",");
@@ -76,7 +80,7 @@ class OSCListener implements OscEventListener {
 
           if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
             if (val > 0)
-              instrument.activate(x, y, val, new GrainSynthNote(out, instrument.getSample(x)));
+              instrument.activate(x, y, val, new GrainSynthNote(out, x, y, val, instrument.activeCount(), instrument.getSample(x)));
             else
               instrument.deactivate(x,y);
           }
@@ -134,6 +138,10 @@ class OSCListener implements OscEventListener {
         //println("cmd: " + cmd);
         int y = int(tokens[2]) - 1;     
         int x = int(tokens[3]) - 1;
+
+        // check if we've initialized the instrument yet
+        if (instrument == null)
+          return true;
    
         y *= 2; // The TouchOSC keyboard only has 5 y values to extend its range
         //println("x: " + x + " y: " + y + " val: " + args[0].floatValue());
@@ -149,7 +157,7 @@ class OSCListener implements OscEventListener {
         
         if (instrumentType == InstrumentType.grainsynth) { // This is all we know how to handle so far
           if (on)
-            instrument.activate(x, y, 0, new GrainSynthNote(out, instrument.getSample(x)));
+            instrument.activate(x, y, 0, new GrainSynthNote(out, x, y, 0, instrument.activeCount(), instrument.getSample(x)));
           else
             instrument.deactivate(x,y);
         }
