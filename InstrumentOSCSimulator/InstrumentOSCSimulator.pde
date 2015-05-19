@@ -73,7 +73,7 @@ void draw() {
   // }
 
   //println("Sending: " + dataStr);
-  OscMessage msg = new OscMessage("/A/C" + instrument);
+  OscMessage msg = new OscMessage("/A/C" + (instrument+1));
   msg.add(arg);
   oscP5.send(msg, sendAddress); 
 }
