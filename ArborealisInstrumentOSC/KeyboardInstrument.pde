@@ -1,32 +1,52 @@
 class KeyboardInstrument extends ArborealisInstrument {
-	boolean[][] status = new boolean[NUM_X][NUM_Y];
+	boolean[][] active = new boolean[NUM_X][NUM_Y];
+	ArrayList<ArborealisNote> notesToStop = new ArrayList<ArborealisNote>();
 
 	KeyboardInstrument(MultiChannelBuffer[] bufs) {
 		super(InstrumentType.keyboard, bufs);
 	}
 
+  // this is called to add a note, but we don't start playing it immediately
   void activate(int x, int y, float z, ArborealisNote note) {
-  	if (!status[x][y]) {
-	  	super.activate(x, y, z, note);
-	  	status[x][y] = true;
+  	if (notes[x][y] == null && !active[x][y]) {
+  		println("Activating keyboard note at (" + x + "," + y + ")");
+	    notes[x][y] = note;
+	    activeCount++;
+      updateAll();
 	  }
 	}
 
+  // this is called to remove a note; for this instrument the note 
+  // removes itself after it starts playing
   void deactivate(int x, int y) {
-  	if (status[x][y]) {
-	  	super.deactivate(x, y);
-	  	status[x][y] = false;
-	  }
-	}
+  	// nothing happens for the keyboard when the note disappears
+  	// except we update the status so it can get triggered again
+  	if (active[x][y]) {
+	  	println("Deactivating keyboard note at (" + x + "," + y + ")");
+		  active[x][y] = false;
+		}
+  }
 
-	void trigger() {
+  // this gets called every beat
+  void trigger() {
+  	// stop active notes that were already played
+  	for (int i = 0; i < notesToStop.size(); i++)
+  		notesToStop.get(i).stop();
+  	notesToStop.clear();
+
+		// start active notes that haven't been played and mark them as played
     for (int x = 0; x < NUM_X; x++)
       for (int y = 0; y < NUM_Y; y++)
-        if (notes[x][y] != null) {
+        if (notes[x][y] != null && !active[x][y]) {
+			    // the note plays once then disappears        	
+		  		println("Starting keyboard note at (" + x + "," + y + ")");
         	notes[x][y].start();
-        	notes[x][y] = null; // the note plays once then disappears
+        	active[x][y] = true;
+        	
+        	notesToStop.add(notes[x][y]);
+        	notes[x][y] = null;
         }
-	}
+  }
 }
 
 // class ArpeggioInstrument extends ArborealisInstrument {

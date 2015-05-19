@@ -14,7 +14,7 @@ class OSCListener implements OscEventListener {
 
   // called behind the scenes by oscP5
   void oscEvent(OscMessage msg) {
-    println("OSC: received message=" + msg.toString());
+    //println("OSC: received message=" + msg.toString());
     
     try {
       OscArgument[] args = new OscArgument[msg.arguments().length];

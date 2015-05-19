@@ -96,14 +96,15 @@ class KeyboardNote implements ArborealisNote
                     KeyboardFuncs.adsrReleaseTime(y, z, numNotes)); 
 
     // create the LFO high pass filter
-    lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, 
-      KeyboardFuncs.highPassFreq(y, z, numNotes) * KeyboardSettings.LFO_AMPLITUDE, Waves.SINE);
-    lfo.offset.setLastValue(KeyboardFuncs.highPassFreq(y, z, numNotes));
-    highPass = new MoogFilter(1, 0, MoogFilter.Type.HP);
-    lfo.patch(highPass.frequency);
+    // lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, 
+    //   KeyboardFuncs.highPassFreq(y, z, numNotes) * KeyboardSettings.LFO_AMPLITUDE, Waves.SINE);
+    // lfo.offset.setLastValue(KeyboardFuncs.highPassFreq(y, z, numNotes));
+    // highPass = new MoogFilter(1, 0, MoogFilter.Type.HP);
+    // lfo.patch(highPass.frequency);
       
     // send output of the Sampler through the high pass filter and adsr into the output
-    samp.patch(highPass).patch(adsr).patch(out);
+    //samp.patch(highPass).patch(adsr).patch(out);
+    samp.patch(adsr).patch(out);
 
     // start playing the Sampler Ugen and the ADSR envelope
     samp.trigger();
@@ -112,15 +113,16 @@ class KeyboardNote implements ArborealisNote
   
   void update(int numNotes) {
     //println("NOTE: Updating note");
-    float hpFreq = KeyboardFuncs.highPassFreq(y, z, numNotes);
-    lfo.amplitude.setLastValue(KeyboardSettings.LFO_AMPLITUDE * hpFreq);
-    lfo.offset.setLastValue(hpFreq);
+    // float hpFreq = KeyboardFuncs.highPassFreq(y, z, numNotes);
+    // lfo.amplitude.setLastValue(KeyboardSettings.LFO_AMPLITUDE * hpFreq);
+    // lfo.offset.setLastValue(hpFreq);
 
-    adsr.setParameters(KeyboardFuncs.adsrMaxAmp(y,z,numNotes),
-                       KeyboardFuncs.adsrAttackTime(y,z,numNotes),
-                       KeyboardFuncs.adsrDecayTime(y,z,numNotes),
-                       KeyboardFuncs.adsrSustainLevel(y,z,numNotes),
-                       KeyboardFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
+    // debug
+    // adsr.setParameters(KeyboardFuncs.adsrMaxAmp(y,z,numNotes),
+    //                    KeyboardFuncs.adsrAttackTime(y,z,numNotes),
+    //                    KeyboardFuncs.adsrDecayTime(y,z,numNotes),
+    //                    KeyboardFuncs.adsrSustainLevel(y,z,numNotes),
+    //                    KeyboardFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
   }
   
 }
