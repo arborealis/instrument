@@ -33,7 +33,7 @@ OscP5 oscP5;
 void setup()
 {
   // call the draw() method at 30fps
-  frameRate(30);
+  frameRate(FPS);
   
   // create the graphics window
   size( 512, 200, P2D );

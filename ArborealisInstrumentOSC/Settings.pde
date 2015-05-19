@@ -4,6 +4,8 @@ static final int OSC_SEND_PORT = 8000;
 static final int NUM_X = 20;      // how many x sections in the instrument 
 static final int NUM_Y = 10;      // how many y sections in the instrument 
 static final int BPM = 120;
+static final int FPS = 10;       // how many frame per second to run the outer loop
+static final boolean VERBOSE = false;
 
 static final int MIN_SILENT_FRAMES_CLIP_SEPARATION = 1000; // min number of frames with value==0, used to separate clips
 static final float SILENCE_VALUE_CUTOFF = 0.01;           // sound values below this number are considered silence

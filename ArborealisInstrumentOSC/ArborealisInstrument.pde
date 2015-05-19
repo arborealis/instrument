@@ -38,7 +38,7 @@ class ArborealisInstrument {
   }
  
   void updateAll() {
-    println("INSTRUMENT: updating notes");
+    //println("INSTRUMENT: updating notes");
     for (int x = 0; x < NUM_X; x++)
       for (int y = 0; y < NUM_Y; y++)
         if (notes[x][y] != null)
@@ -51,11 +51,30 @@ class ArborealisInstrument {
   
   void activate(int x, int y, float z, ArborealisNote note) {
     if (notes[x][y] != null)
+    {
+      if (VERBOSE) println("INSTRUMENT: ignoring note (" + x + "," + y + ") because already playing");
       return;
+    }
+
+    // don't activate this note if there is already a note with the same x and higher y
+    for (int y2 = y+1; y2 < NUM_Y; y2++)
+      if (notes[x][y2] != null)
+      {
+        if (VERBOSE) println("INSTRUMENT: ignoring note (" + x + "," + y + ") because higher y note is playing at same x");        
+        return;
+      }
+
+    // stop notes with the same x but lower y
+    for (int y2 = 0; y2 < NUM_Y; y2++)
+      if (notes[x][y2] != null) {
+        if (VERBOSE) println("INSTRUMENT: deactivating note (" + x + "," + y2 + ") because about to play higher y note with same x");
+        deactivate(x, y);
+      }
 
     activeCount++;
     updateAll();
 
+    if (VERBOSE) println("INSTRUMENT: activating note (" + x + "," + y + ")");
     note.start();
     notes[x][y] = note;
   }

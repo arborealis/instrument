@@ -63,7 +63,7 @@ class GrainSynthNote implements ArborealisNote
 
   void stop() {
     if (samp != null) {
-      println("NOTE: Stopping grain synth at (" + x + "," + y + ")");
+      if (VERBOSE) println("NOTE: Stopping grain synth at (" + x + "," + y + ")");
       
       adsr.unpatchAfterRelease(out);
       adsr.noteOff();
@@ -75,7 +75,7 @@ class GrainSynthNote implements ArborealisNote
   // Start the Note.
   void start() {    
     if (samp != null) {
-      println("Ignoring attempt to start grain synth while already playing");
+      if (VERBOSE) println("Ignoring attempt to start grain synth while already playing");
       return;
     }
       
@@ -83,7 +83,7 @@ class GrainSynthNote implements ArborealisNote
     float duration = GrainSynthFuncs.clipDuration(y);
     MultiChannelBuffer buf2 = getSubBuffer(this.buf, 0, (int)(duration * this.buf.getBufferSize()));
 
-    println("NOTE: Starting grain synth at (" + x + "," + y + ") with duration: " + duration);
+    if (VERBOSE) println("NOTE: Starting grain synth at (" + x + "," + y + ") with duration: " + duration);
         
     // create a Sampler Ugen and turn on looping
     samp = new Sampler(buf2, 44100, 1);

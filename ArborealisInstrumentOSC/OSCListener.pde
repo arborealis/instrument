@@ -6,6 +6,7 @@ class OSCListener implements OscEventListener {
   OscP5 oscP5;
   NetAddress remoteAddress;
   ArborealisInstrument[] instruments;
+  int lastOscEvent = millis();
   
   OSCListener(OscP5 oscP5, ArborealisInstrument[] instruments) {
     this.oscP5 = oscP5;
@@ -14,8 +15,9 @@ class OSCListener implements OscEventListener {
 
   // called behind the scenes by oscP5
   void oscEvent(OscMessage msg) {
-    //println("OSC: received message=" + msg.toString());
-    
+    if (VERBOSE) println("OSC: received message=" + msg.toString() + "(t=" + (millis() - lastOscEvent) + ")");
+    lastOscEvent = millis();
+
     try {
       OscArgument[] args = new OscArgument[msg.arguments().length];
       for (int i = 0; i < msg.arguments().length; i++)
@@ -40,6 +42,7 @@ class OSCListener implements OscEventListener {
   void oscStatus(OscStatus theStatus) {
     println("OSC: status=" + theStatus.id());
   }  
+
 
   // update the state by parsing an OSC command
   boolean updateState(String path, OscArgument[] args) {
@@ -76,7 +79,7 @@ class OSCListener implements OscEventListener {
         assert(strVals.length == NUM_X * NUM_Y);
         //println("Received camera input: " + vals.length + " values");
 
-        for (int i = 0; i < strVals.length; i++) {
+        for (int i = strVals.length - 1; i >= 0; i--) {
           int x = i % NUM_X;
           int y = i / NUM_X;
           float z = float(strVals[i]);
