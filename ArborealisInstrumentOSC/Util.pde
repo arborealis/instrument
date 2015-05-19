@@ -1,30 +1,66 @@
 
-// load a file from disk, split it evenly and create instruments from the samples
-MultiChannelBuffer[] parseSampleFile(String filename) {  
-  MultiChannelBuffer[] bufs = new MultiChannelBuffer[NUM_X];
-  
+// load a file from disk; split it evenly or use return to zeros
+MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero) {  
+  ArrayList<MultiChannelBuffer> bufs = new ArrayList<MultiChannelBuffer>();    
+
   // load sample
   MultiChannelBuffer mainBuf = new MultiChannelBuffer(1,2); // argument here are overriden on the next line
   minim.loadFileIntoBuffer(filename, mainBuf);
   
-  // split sample into sub-samples of equal size
-  int nfTot = mainBuf.getBufferSize();
-  int nfSub = nfTot/NUM_X;  
-  int nc = mainBuf.getChannelCount();
-  println("# Sample frames: " + nfTot);
-  println("# Sub-sample frames: " + nfSub);
+  if (!useReturnToZero) {
+    // split sample into sub-samples of equal size
+    int nfTot = mainBuf.getBufferSize();
+    int nfSub = nfTot/NUM_X;  
+    int nc = mainBuf.getChannelCount();
+    println("# Sample frames: " + nfTot);
+    println("# Sub-sample frames: " + nfSub);
 
-  // Split the main sample buffer into sub-samples
-  for (int s = 0; s < NUM_X; s++) {
-    bufs[s] = new MultiChannelBuffer(nfSub, nc);
-    for (int c = 0; c < nc; c++) {
-      float[] frames = mainBuf.getChannel(c);
-      float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
-      bufs[s].setChannel(c, subFrames);
+    // Split the main sample buffer into sub-samples
+    for (int s = 0; s < NUM_X; s++) {
+      MultiChannelBuffer buf = new MultiChannelBuffer(nfSub, nc);
+      for (int c = 0; c < nc; c++) {
+        float[] frames = mainBuf.getChannel(c);
+        float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
+        buf.setChannel(c, subFrames);
+      }
+      bufs.add(buf);
+    }
+  } else {
+    if (mainBuf.getChannelCount() > 1)
+      println("FILE: using only first channel of multi channel file");
+    float[] frames = mainBuf.getChannel(0);
+
+    //println("FILE: Looking for clips in sample with length=" + frames.length);
+
+    int bufInd = 0;
+    while (bufInd < frames.length) {
+      int startInd = findNextNonSilence(frames, bufInd, SILENCE_VALUE_CUTOFF);
+      if (startInd == -1)
+        break;
+      //println("FILE: Found next nonzero=" + startInd);
+
+      int endInd = findNextSilence(frames, startInd, MIN_SILENT_FRAMES_CLIP_SEPARATION, SILENCE_VALUE_CUTOFF);
+      //println("FILE: Found next multiple zeros=" + endInd);
+      if (endInd == -1)
+        endInd = frames.length;
+
+      MultiChannelBuffer buf = new MultiChannelBuffer(endInd - startInd, 1);
+      buf.setChannel(0, Arrays.copyOfRange(frames, startInd, endInd));
+      bufs.add(buf);
+
+      bufInd = endInd;
     }
   }
+
+  if (bufs.size() != NUM_X)
+    println("FILE: found " + bufs.size() + " clips in sample but expected " + NUM_X);
+
+  // fill the buffer array with exactly NUM_X buffers
+  MultiChannelBuffer[] bufArray = new MultiChannelBuffer[NUM_X];
+  for (int i = 0; i < NUM_X; i++)
+    bufArray[i] = bufs.get(i % bufs.size());
   
-  return bufs;
+  return bufArray;
 }
 
 
@@ -91,8 +127,37 @@ int findZeroCrossing(float[] array, boolean front, int offset) {
         return i;
     }
   }
-  println("Couldn't find zero crossing.");
-  assert(false);
+  // println("Couldn't find zero crossing.");
+  // assert(false);
+  return -1;
+}
+
+int findNextSilence(float[] array, int offset, int numZeros, float cutoff) {
+  int numZerosRemaining = numZeros;
+  int startZeroInd = -1;
+
+  for (int i = offset; i < array.length; i++) {
+    if (Math.abs(array[i]) <= cutoff) {
+      //println("Found zero: " + i);
+      if (numZerosRemaining == numZeros)
+        startZeroInd = i;
+      else if (numZerosRemaining == 0)
+        return startZeroInd;
+      numZerosRemaining--;
+    } else {
+      numZerosRemaining = numZeros;
+    }
+  }  
+  return -1;
+}
+
+int findNextNonSilence(float[] array, int offset, float cutoff) {
+  for (int i = offset; i < array.length; i++) {
+    if (Math.abs(array[i]) > cutoff)
+      return i;
+  }
+  // println("Couldn't find nonzero value.");
+  // assert(false);
   return -1;
 }
 
@@ -101,6 +166,7 @@ int findZeroCrossing(float[] array, boolean front, int offset) {
 float[] trimToZeroCrossings(float[] array) {
   int start = findZeroCrossing(array, true, 0);
   int end = findZeroCrossing(array, false, 0);
+  assert(start != -1 && end != -1);
   //println("trimtoZC start=" + start + " end=" + end + " length=" + array.length);
   
   return Arrays.copyOfRange(array, start, end);

@@ -75,7 +75,7 @@ class KeyboardNote implements ArborealisNote
   // Start the Note.
   void start() {    
     if (samp != null) {
-      println("Ignoring attempt to start keyboard while already playing");
+      println("NOTE: Ignoring attempt to start keyboard at (" + x + "," + y + ") while already playing");
       return;
     }
       

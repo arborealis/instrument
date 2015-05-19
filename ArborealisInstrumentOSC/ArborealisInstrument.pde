@@ -2,11 +2,11 @@ ArborealisInstrument instrumentFactory(InstrumentType instrumentType, String fil
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
   if (instrumentType == InstrumentType.grainsynth)
-    return new ArborealisInstrument(instrumentType, parseSampleFile(filename));
+    return new ArborealisInstrument(instrumentType, parseSampleFile(filename, false));
   else if (instrumentType == InstrumentType.keyboard)
-    return new KeyboardInstrument(parseSampleFile(filename));
+    return new KeyboardInstrument(parseSampleFile(filename, true));
   else if (instrumentType == InstrumentType.arpeggio)
-    return new KeyboardInstrument(parseSampleFile(filename));
+    return new KeyboardInstrument(parseSampleFile(filename, true));
   else
     assert(false);
   return null;
