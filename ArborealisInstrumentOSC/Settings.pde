@@ -16,8 +16,8 @@ public class KeyboardSettings {
   static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
   static public final float ADSR_DECAY_TIME = 0.25;          // constant
   static public final float ADSR_MIN_SUSTAIN_LEVEL = 0.25;   // constant
-  static public final float ADSR_MIN_RELEASE_TIME = 0.5;     // function of y
-  static public final float ADSR_MAX_RELEASE_TIME = 4;       // function of y
+  static public final float ADSR_MIN_RELEASE_TIME = 0.2;     // function of y
+  static public final float ADSR_MAX_RELEASE_TIME = 1;       // function of y
 
   static public final int HIGH_PASS_MIN_FREQUENCY = 200;
   static public final int HIGH_PASS_MAX_FREQUENCY = 4000;
@@ -44,8 +44,8 @@ public class GrainSynthSettings {
   static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
   static public final float ADSR_DECAY_TIME = 0.25;          // constant
   static public final float ADSR_MIN_SUSTAIN_LEVEL = 0.25;   // constant
-  static public final float ADSR_MIN_RELEASE_TIME = 0.5;     // function of y
-  static public final float ADSR_MAX_RELEASE_TIME = 4;       // function of y
+  static public final float ADSR_MIN_RELEASE_TIME = 0.2;     // function of y
+  static public final float ADSR_MAX_RELEASE_TIME = 1;       // function of y
 
   static public final int HIGH_PASS_MIN_FREQUENCY = 200;
   static public final int HIGH_PASS_MAX_FREQUENCY = 4000;
@@ -56,7 +56,7 @@ public class GrainSynthSettings {
   static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
 
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
-  static public final String USE_FILE = "../samples/grain.wav";
+  static public final String USE_FILE = "../samples/vsonar.wav";
   //static public final String USE_FILE = "";
 }
 //////////// End of parameters to edit ////////////
