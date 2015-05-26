@@ -35,7 +35,8 @@ void setup()
   delays[1] = new Delay( MAX_AMP, MAX_TIME, true, true );
   delays[2] = new Delay( MAX_AMP, MAX_TIME, true, true );
   delays[3] = new Delay( MAX_AMP, MAX_TIME, true, true );
-  
+  updateDelays();
+
   selectInput("Select an audio file to use", "selectFile");
 
   cp5 = new ControlP5(this);
@@ -66,7 +67,13 @@ void draw()
   background(0);  
 }
 
-public void controlEvent(ControlEvent theEvent) {
+public void controlEvent(ControlEvent theEvent)
+{
+  updateDelays();
+}
+
+void updateDelays()
+{
   delays[0].setDelTime(time1);
   delays[0].setDelAmp(amplitude1);
   delays[1].setDelTime(time2);
