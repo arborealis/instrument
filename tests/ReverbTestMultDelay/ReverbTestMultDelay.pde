@@ -7,6 +7,7 @@ Minim minim;
 AudioOutput out;
 Delay[] delays;
 Sampler sample = null;
+MoogFilter highPass;
 
 float amplitude1 = 0.05;
 float amplitude2 = 0.05;
@@ -17,6 +18,9 @@ float time1 = 1/64.0;
 float time2 = 1/32.0;
 float time3 = 3/64.0;
 float time4 = 1/8.0;
+
+float highPassFrequency = 2000;
+float highPassResonance = 0;
 
 float MAX_AMP = 1;
 float MAX_TIME = 1;
@@ -35,7 +39,10 @@ void setup()
   delays[1] = new Delay( MAX_AMP, MAX_TIME, true, true );
   delays[2] = new Delay( MAX_AMP, MAX_TIME, true, true );
   delays[3] = new Delay( MAX_AMP, MAX_TIME, true, true );
-  updateDelays();
+
+  highPass = new MoogFilter(highPassFrequency, highPassResonance, MoogFilter.Type.HP);
+
+  update();
 
   selectInput("Select an audio file to use", "selectFile");
 
@@ -48,6 +55,8 @@ void setup()
   cp5.addSlider("time3", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
   cp5.addSlider("amplitude4", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
   cp5.addSlider("time4", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
+  cp5.addSlider("highPassFrequency", 100, 20000).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
+  cp5.addSlider("highPassResonance", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
 }
 
 void selectFile(File filename)
@@ -58,7 +67,7 @@ void selectFile(File filename)
   sample  = new Sampler( buf, 44100, 1 );
   sample.looping = true;
 
-  sample.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(out);
+  sample.patch(highPass).patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(out);
   sample.trigger();      
 }
 
@@ -69,10 +78,10 @@ void draw()
 
 public void controlEvent(ControlEvent theEvent)
 {
-  updateDelays();
+  update();
 }
 
-void updateDelays()
+void update()
 {
   delays[0].setDelTime(time1);
   delays[0].setDelAmp(amplitude1);
@@ -82,5 +91,8 @@ void updateDelays()
   delays[2].setDelAmp(amplitude3);
   delays[3].setDelTime(time4);
   delays[3].setDelAmp(amplitude4);
+
+  highPass.frequency.setLastValue(highPassFrequency);
+  highPass.resonance.setLastValue(highPassResonance);
 }
 
