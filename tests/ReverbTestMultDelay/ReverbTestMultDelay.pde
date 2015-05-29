@@ -14,7 +14,7 @@ Summer summer;
 
 float amplitude1 = 0.15;
 float amplitude2 = 0.22;
-float amplitude3 = 0.35;
+float amplitude3 = 0.25;
 float amplitude4 = 0.6;
 
 float time1 = 1/64.0;
@@ -26,10 +26,10 @@ float high_pass_frequency = 2000;
 float high_pass_resonance = 0;
 
 float dry_amplitude_dB = 0;
-float wet_amplitude_dB = 30;
-float wet_shifted_amplitude_dB = 30;
+float wet_amplitude_dB = 28;
+float wet_shifted_amplitude_dB = 75;
 
-float wet_shifted_factor = 2;
+float wet_shifted_factor = 4;
 
 float MAX_AMP = 1;
 float MAX_TIME = 1;
