@@ -27,7 +27,7 @@ float high_pass_resonance = 0;
 
 float dry_amplitude_dB = 0;
 float wet_amplitude_dB = 30;
-float wet_shifted_amplitude_dB = 0;
+float wet_shifted_amplitude_dB = 30;
 
 float wet_shifted_factor = 2;
 
@@ -85,7 +85,7 @@ void initUgens()
 
   highPass = new MoogFilter(high_pass_frequency, high_pass_resonance, MoogFilter.Type.HP);
 
-  pitchShift = new PitchShift(wet_shifted_factor, 2048, 4);
+  pitchShift = new PitchShift(wet_shifted_factor, 2048, 3);
 
   dryGain = new Gain(dry_amplitude_dB);
   wetGain = new Gain(wet_amplitude_dB);
