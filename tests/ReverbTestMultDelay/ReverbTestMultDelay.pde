@@ -54,9 +54,9 @@ void setup()
   cp5.addSlider("time4", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
   cp5.addSlider("high_pass_frequency", 100, 20000).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
   cp5.addSlider("high_pass_resonance", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
-  cp5.addSlider("dry_amplitude_dB", -60, 60).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
-  cp5.addSlider("wet_amplitude_dB", -60, 60).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
-  cp5.addSlider("wet_shifted_amplitude_dB", -60, 60).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
+  cp5.addSlider("dry_amplitude_dB", -90, 90).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
+  cp5.addSlider("wet_amplitude_dB", -90, 90).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
+  cp5.addSlider("wet_shifted_amplitude_dB", -90, 90).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
   cp5.addSlider("wet_shifted_factor", 0.1, 10).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
 
   selectInput("Select an audio file to use", "selectFile");
@@ -101,7 +101,7 @@ void initUgens()
 
   sample.patch(highPass).patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(wetGain).patch(summer);
 
-  wetGain.patch(pitchShift).patch(wetShiftedGain).patch(summer);
+  delays[3].patch(pitchShift).patch(wetShiftedGain).patch(summer);
 
   sample.patch(dryGain).patch(summer);
 
