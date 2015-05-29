@@ -67,7 +67,7 @@ void selectFile(File filename)
   MultiChannelBuffer buf = new MultiChannelBuffer(1,2);
   minim.loadFileIntoBuffer(filename.getPath(), buf);
   
-  sample = new Sampler( buf, 44100, 1 );
+  sample = new Sampler( buf, 44100, 3 );
   sample.looping = true;
   sample.trigger();
 
@@ -101,7 +101,7 @@ void initUgens()
 
   sample.patch(highPass).patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(wetGain).patch(summer);
 
-  //sample.patch(delays[3]).patch(pitchShift).patch(wetShiftedGain).patch(summer);
+  wetGain.patch(pitchShift).patch(wetShiftedGain).patch(summer);
 
   sample.patch(dryGain).patch(summer);
 
