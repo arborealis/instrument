@@ -97,5 +97,7 @@ class ArborealisInstrument {
   UGen getOutUgen() { return outUgen; }
 
   InstrumentType type() { return type; }
+
+  void updateSettings() {};
 };
 

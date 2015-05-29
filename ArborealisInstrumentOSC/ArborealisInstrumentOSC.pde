@@ -1,4 +1,4 @@
-// Main file for the ArborealisInstrumentOSC sketch
+ // Main file for the ArborealisInstrumentOSC sketch
 
 // Settings to customize can be found in Settings.pde
 
@@ -12,7 +12,7 @@ import ddf.minim.ugens.*;
 import ddf.minim.UGen;
 import java.util.Arrays;
 import oscP5.*;
-
+import controlP5.*;
 
 Minim minim;
 AudioOutput out;
@@ -36,7 +36,7 @@ void setup()
   frameRate(FPS);
   
   // create the graphics window
-  size( 512, 200, P2D );
+  size( 700, 400, P2D );
   
   // create the audio synthesis instance and the AudioOutput instance
   minim = new Minim( this );
@@ -52,10 +52,15 @@ void setup()
   }
 
   // start the osc server
-  oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
-  OSCListener list = new OSCListener(oscP5, instruments);
-  oscP5.addListener(list);  
-
+  if (ENABLE_OSC) {
+    oscP5 = new OscP5(this, OSC_RECEIVE_PORT);
+    OSCListener list = new OSCListener(oscP5, instruments);
+    oscP5.addListener(list);  
+  }
+  
+  // create the settings controls
+  createControls();
+  
   // debugging: play a note on startup
   instruments[0].activate(1, 9, 0, noteFactory(instruments[0], 1, 9, 0));
 }
@@ -97,8 +102,8 @@ void draw()
     lastBeatTime = millis();
   }
 
-  // erase the window to grey
-  background( 192 );
+  // erase the window to black
+  background( 0 );
   // // draw using a black stroke
   // stroke( 0 );
   // // draw the waveforms
@@ -127,3 +132,4 @@ void keyPressed() {
     println("RECORD: started");
   }
 }  
+
