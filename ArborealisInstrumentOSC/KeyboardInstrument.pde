@@ -2,8 +2,8 @@ class KeyboardInstrument extends ArborealisInstrument {
 	boolean[][] active = new boolean[NUM_X][NUM_Y];
 	ArrayList<ArborealisNote> notesToStop = new ArrayList<ArborealisNote>();
 
-	KeyboardInstrument(MultiChannelBuffer[] bufs) {
-		super(InstrumentType.keyboard, bufs);
+	KeyboardInstrument(AudioOutput out, MultiChannelBuffer[] bufs) {
+		super(out, InstrumentType.keyboard, bufs);
 	}
 
   // this is called to add a note, but we don't start playing it immediately
@@ -47,7 +47,7 @@ class KeyboardInstrument extends ArborealisInstrument {
         	notes[x][y] = null;
         }
   }
-}
+};
 
 // class ArpeggioInstrument extends ArborealisInstrument {
 // 	KeyboardInstrument(MultiChannelBuffer[] bufs) {

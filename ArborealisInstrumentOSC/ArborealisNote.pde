@@ -4,13 +4,13 @@ interface ArborealisNote {
   void update(int numNotes);
 }
 
-ArborealisNote noteFactory(AudioOutput out, ArborealisInstrument instrument, int x, int y, float z) {
+ArborealisNote noteFactory(ArborealisInstrument instrument, int x, int y, float z) {
   if (instrument.type() == InstrumentType.grainsynth)
-	return new GrainSynthNote(out, x, y, z, instrument.numNotes(), instrument.getSample(x));
+	return new GrainSynthNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else if (instrument.type() == InstrumentType.keyboard)
-	return new KeyboardNote(out, x, y, z, instrument.numNotes(), instrument.getSample(x));
+	return new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else if (instrument.type() == InstrumentType.arpeggio)
-	return new KeyboardNote(out, x, y, z, instrument.numNotes(), instrument.getSample(x));
+	return new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else
   	assert(false);
 

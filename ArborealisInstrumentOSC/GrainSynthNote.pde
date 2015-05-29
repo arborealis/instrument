@@ -38,7 +38,7 @@ static class GrainSynthFuncs {
 // a number of these to play each of the different samples.
 class GrainSynthNote implements ArborealisNote
 { 
-  AudioOutput out;
+  UGen outUgen;
   Sampler samp;
   ADSR adsr;
   Oscil lfo;
@@ -50,9 +50,9 @@ class GrainSynthNote implements ArborealisNote
 
   
   // Create an instrument from an audio buffer
-  GrainSynthNote(AudioOutput out, int x, int y, float z, int numNotes, MultiChannelBuffer buf)
+  GrainSynthNote(UGen outUgen, int x, int y, float z, int numNotes, MultiChannelBuffer buf)
   { 
-    this.out = out;
+    this.outUgen = outUgen;
     this.buf = buf;
     this.x = x;
     this.y = y;
@@ -65,7 +65,7 @@ class GrainSynthNote implements ArborealisNote
     if (samp != null) {
       if (VERBOSE) println("NOTE: Stopping grain synth at (" + x + "," + y + ")");
       
-      adsr.unpatchAfterRelease(out);
+      adsr.unpatchAfterRelease(outUgen);
       adsr.noteOff();
 
       samp = null;
@@ -104,7 +104,7 @@ class GrainSynthNote implements ArborealisNote
     lfo.patch(highPass.frequency);
       
     // send output of the Sampler through the high pass filter and adsr into the output
-    samp.patch(highPass).patch(adsr).patch(out);
+    samp.patch(highPass).patch(adsr).patch(outUgen);
 
     // start playing the Sampler Ugen and the ADSR envelope
     samp.trigger();

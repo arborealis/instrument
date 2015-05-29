@@ -56,7 +56,7 @@ public class GrainSynthSettings {
   static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
 
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
-  static public final String USE_FILE = "../samples/vsonar.wav";
+  static public final String USE_FILE = "../samples/grain.wav";
   //static public final String USE_FILE = "";
 }
 //////////// End of parameters to edit ////////////

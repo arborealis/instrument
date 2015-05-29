@@ -1,12 +1,12 @@
-ArborealisInstrument instrumentFactory(InstrumentType instrumentType, String filename) {
+ArborealisInstrument instrumentFactory(AudioOutput out, InstrumentType instrumentType, String filename) {
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
   if (instrumentType == InstrumentType.grainsynth)
-    return new ArborealisInstrument(instrumentType, parseSampleFile(filename, false));
+    return new GrainSynthInstrument(out, parseSampleFile(filename, false));
   else if (instrumentType == InstrumentType.keyboard)
-    return new KeyboardInstrument(parseSampleFile(filename, true));
+    return new KeyboardInstrument(out, parseSampleFile(filename, true));
   else if (instrumentType == InstrumentType.arpeggio)
-    return new KeyboardInstrument(parseSampleFile(filename, true));
+    return new KeyboardInstrument(out, parseSampleFile(filename, true));
   else
     assert(false);
   return null;
@@ -18,11 +18,17 @@ class ArborealisInstrument {
   protected MultiChannelBuffer[] bufs;
   protected int activeCount = 0;
   protected InstrumentType type;
+  protected AudioOutput out;
+  protected Summer outUgen;
 
-  ArborealisInstrument(InstrumentType type, MultiChannelBuffer[] bufs) {
+  ArborealisInstrument(AudioOutput out, InstrumentType type, MultiChannelBuffer[] bufs) {
+    this.out = out;
     this.bufs = bufs;
     this.type = type;
     notes = new ArborealisNote[NUM_X][NUM_Y];
+
+    outUgen = new Summer();
+    outUgen.patch(out);    
   }
   
   // stop all instruments
@@ -93,5 +99,8 @@ class ArborealisInstrument {
 
   void trigger() {}
 
+  UGen getOutUgen() { return outUgen; }
+
   InstrumentType type() { return type; }
-}
+};
+

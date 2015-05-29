@@ -48,7 +48,7 @@ void setup()
     if (settings.useFile.equals(""))
       selectInput("Select an audio file to use for the '" + instrumentType + "'", "create_" + instrumentType);
     else
-      create_instrument(instrumentType, new File(sketchPath(settings.useFile)));
+      create_instrument(out, instrumentType, new File(sketchPath(settings.useFile)));
   }
 
   // start the osc server
@@ -57,15 +57,15 @@ void setup()
   oscP5.addListener(list);  
 
   // debugging: play a note on startup
-  //instruments[0].start(1, 9, 0, new GrainSynthNote(out, instruments[0].getSample(1)));
+  instruments[0].activate(1, 9, 0, noteFactory(instruments[0], 1, 9, 0));
 }
 
 
 // Create an instrument of the given type from a file
-void create_instrument(InstrumentType instrumentType, File file) {
+void create_instrument(AudioOutput out, InstrumentType instrumentType, File file) {
   if (file.exists()) {
     println("Creating instrument " + instrumentType + " from file: " + file.getPath());
-    instruments[instrumentType.ordinal()] = instrumentFactory(instrumentType, file.getPath());
+    instruments[instrumentType.ordinal()] = instrumentFactory(out, instrumentType, file.getPath());
   } else {
     println("ERROR: unable to open sound file: " + file.getPath());;
   }
@@ -73,13 +73,13 @@ void create_instrument(InstrumentType instrumentType, File file) {
 
 // This code is called by the selectInput() method when a file has been selected
 void create_grainsynth(File file) {
-  create_instrument(InstrumentType.grainsynth, file);
+  create_instrument(out, InstrumentType.grainsynth, file);
 }
 void create_keyboard(File file) {
-  create_instrument(InstrumentType.keyboard, file);
+  create_instrument(out, InstrumentType.keyboard, file);
 }
 void create_arpeggio(File file) {
-  create_instrument(InstrumentType.arpeggio, file);
+  create_instrument(out, InstrumentType.arpeggio, file);
 }
  
 

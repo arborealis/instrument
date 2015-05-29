@@ -85,7 +85,7 @@ class OSCListener implements OscEventListener {
           float z = float(strVals[i]);
 
           if (z > 0)
-            instrument.activate(x, y, z, noteFactory(out, instrument, x, y, z));
+            instrument.activate(x, y, z, noteFactory(instrument, x, y, z));
           else
             instrument.deactivate(x, y);
         }
@@ -160,7 +160,7 @@ class OSCListener implements OscEventListener {
         println("OSC: TouchOSC event instrument=" + instrumentType.ordinal() + ", x=" + x + ", y=" + y + ", state=" + on);
         
         if (on)
-          instrument.activate(x, y, 1, noteFactory(out, instrument, x, y, 1));
+          instrument.activate(x, y, 1, noteFactory(instrument, x, y, 1));
         else
           instrument.deactivate(x, y);
 
