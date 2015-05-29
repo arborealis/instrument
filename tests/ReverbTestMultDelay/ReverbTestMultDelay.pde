@@ -12,10 +12,10 @@ Gain dryGain, wetGain, wetShiftedGain;
 PitchShift pitchShift;
 Summer summer;
 
-float amplitude1 = 0.05;
-float amplitude2 = 0.05;
-float amplitude3 = 0.05;
-float amplitude4 = 0.1;
+float amplitude1 = 0.15;
+float amplitude2 = 0.22;
+float amplitude3 = 0.35;
+float amplitude4 = 0.6;
 
 float time1 = 1/64.0;
 float time2 = 1/32.0;
@@ -26,7 +26,7 @@ float high_pass_frequency = 2000;
 float high_pass_resonance = 0;
 
 float dry_amplitude_dB = 0;
-float wet_amplitude_dB = 0;
+float wet_amplitude_dB = 30;
 float wet_shifted_amplitude_dB = 0;
 
 float wet_shifted_factor = 2;
