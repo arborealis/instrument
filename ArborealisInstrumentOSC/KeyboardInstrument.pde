@@ -3,7 +3,10 @@ class KeyboardInstrument extends ArborealisInstrument {
 	ArrayList<ArborealisNote> notesToStop = new ArrayList<ArborealisNote>();
 
 	KeyboardInstrument(AudioOutput out, MultiChannelBuffer[] bufs) {
-		super(out, InstrumentType.keyboard, bufs);
+		super(InstrumentType.keyboard, bufs);
+
+      outUgen = new Summer();
+      outUgen.patch(out);    
 	}
 
   // this is called to add a note, but we don't start playing it immediately

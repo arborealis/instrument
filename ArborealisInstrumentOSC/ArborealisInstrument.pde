@@ -18,17 +18,12 @@ class ArborealisInstrument {
   protected MultiChannelBuffer[] bufs;
   protected int activeCount = 0;
   protected InstrumentType type;
-  protected AudioOutput out;
-  protected Summer outUgen;
+  protected UGen outUgen;
 
-  ArborealisInstrument(AudioOutput out, InstrumentType type, MultiChannelBuffer[] bufs) {
-    this.out = out;
+  ArborealisInstrument(InstrumentType type, MultiChannelBuffer[] bufs) {
     this.bufs = bufs;
     this.type = type;
     notes = new ArborealisNote[NUM_X][NUM_Y];
-
-    outUgen = new Summer();
-    outUgen.patch(out);    
   }
   
   // stop all instruments
