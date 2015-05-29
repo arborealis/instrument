@@ -99,7 +99,7 @@ void initUgens()
 
   updateUgens();
 
-  sample.patch(highPass).patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(wetGain).patch(summer);
+  sample.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPass).patch(wetGain).patch(summer);
 
   delays[3].patch(pitchShift).patch(wetShiftedGain).patch(summer);
 
