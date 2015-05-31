@@ -21,7 +21,7 @@ static class GrainSynthFuncs {
     return map(y, 1.0, NUM_Y, GrainSynthSettings.ADSR_MIN_RELEASE_TIME, GrainSynthSettings.ADSR_MAX_RELEASE_TIME);
   }    
 
-  static float highPassFreq(int y, float z, int numNotes) {
+  static float highPassFreq(int numNotes) {
     numNotes = constrain(numNotes, 1, NUM_X);
     return map(numNotes, 1, NUM_X, 
       GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY);
@@ -41,8 +41,6 @@ class GrainSynthNote implements ArborealisNote
   UGen outUgen;
   Sampler samp;
   ADSR adsr;
-  Oscil lfo;
-  MoogFilter highPass;
   MultiChannelBuffer buf;  // the input buffer containing the whole sample
   float duration;
   int x, y, numNotes;
@@ -96,32 +94,21 @@ class GrainSynthNote implements ArborealisNote
                     GrainSynthFuncs.adsrSustainLevel(y, z, numNotes),
                     GrainSynthFuncs.adsrReleaseTime(y, z, numNotes)); 
 
-    // create the LFO high pass filter
-    lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, 
-      GrainSynthFuncs.highPassFreq(y, z, numNotes) * GrainSynthSettings.LFO_AMPLITUDE, Waves.SINE);
-    lfo.offset.setLastValue(GrainSynthFuncs.highPassFreq(y, z, numNotes));
-    highPass = new MoogFilter(1, 0, MoogFilter.Type.HP);
-    lfo.patch(highPass.frequency);
-      
+
     // send output of the Sampler through the high pass filter and adsr into the output
-    samp.patch(highPass).patch(adsr).patch(outUgen);
+    samp.patch(adsr).patch(outUgen);
 
     // start playing the Sampler Ugen and the ADSR envelope
     samp.trigger();
     adsr.noteOn();
   }
   
-  void update(int numNotes) {
-    //println("NOTE: Updating note");
-    float hpFreq = GrainSynthFuncs.highPassFreq(y, z, numNotes);
-    lfo.amplitude.setLastValue(GrainSynthSettings.LFO_AMPLITUDE * hpFreq);
-    lfo.offset.setLastValue(hpFreq);
-
-    adsr.setParameters(GrainSynthFuncs.adsrMaxAmp(y,z,numNotes),
-                       GrainSynthFuncs.adsrAttackTime(y,z,numNotes),
-                       GrainSynthFuncs.adsrDecayTime(y,z,numNotes),
-                       GrainSynthFuncs.adsrSustainLevel(y,z,numNotes),
-                       GrainSynthFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
-  }
+  // void update(int numNotes) {
+  //   adsr.setParameters(GrainSynthFuncs.adsrMaxAmp(y,z,numNotes),
+  //                      GrainSynthFuncs.adsrAttackTime(y,z,numNotes),
+  //                      GrainSynthFuncs.adsrDecayTime(y,z,numNotes),
+  //                      GrainSynthFuncs.adsrSustainLevel(y,z,numNotes),
+  //                      GrainSynthFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
+  // }
   
 }

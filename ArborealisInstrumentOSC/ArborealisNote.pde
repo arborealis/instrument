@@ -1,7 +1,7 @@
 interface ArborealisNote {
   void start();
   void stop();
-  void update(int numNotes);
+//  void update(int numNotes);
 }
 
 ArborealisNote noteFactory(ArborealisInstrument instrument, int x, int y, float z) {

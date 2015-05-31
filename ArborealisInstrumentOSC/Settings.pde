@@ -8,10 +8,7 @@ static final int FPS = 10;       // how many frame per second to run the outer l
 static final boolean VERBOSE = false;
 static final int SLIDER_WIDTH = 500;
 static final int SLIDER_HEIGHT = 20;
-static final boolean ENABLE_OSC = false;
-
-static final int MIN_SILENT_FRAMES_CLIP_SEPARATION = 1000; // min number of frames with value==0, used to separate clips
-static final float SILENCE_VALUE_CUTOFF = 0.01;           // sound values below this number are considered silence
+static final boolean ENABLE_OSC = true;
 
 public class KeyboardSettings {
   static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
@@ -30,6 +27,9 @@ public class KeyboardSettings {
   static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
   static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
 
+  static final int SILENCE_MIN_FRAMES_CLIP_SEPARATION = 1000; // min number of frames with value==0, used to separate clips
+  static final float SILENCE_VALUE_CUTOFF = 0.01;            // sound values below this number are considered silence
+
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
   static public final String USE_FILE = "../samples/piano.wav";
   //static public final String USE_FILE = "";
@@ -41,6 +41,8 @@ public class ArpeggioSettings {
   //static public final String USE_FILE = "";
 }
 
+// Config settings for the grain synth instrument. Some of these are constants and others
+// can be modified by on screen controls
 static public class GrainSynthSettings {
   static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
   static public final float ADSR_MIN_ATTACK_TIME = 0.25;     // function of 1/y
@@ -53,8 +55,8 @@ static public class GrainSynthSettings {
   static public int HIGH_PASS_MIN_FREQUENCY = 200;
   static public int HIGH_PASS_MAX_FREQUENCY = 4000;
   static public float HIGH_PASS_RESONANCE = 0;
-  static public final float LFO_AMPLITUDE = 0.2;             // the lfo range: percentage of the high pass frequency
-  static public final float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
+  static public float LFO_AMPLITUDE = 0.2;             // the lfo range: percentage of the high pass frequency
+  static public float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
 
   static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
   static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat

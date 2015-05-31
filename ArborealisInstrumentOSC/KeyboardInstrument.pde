@@ -15,7 +15,7 @@ class KeyboardInstrument extends ArborealisInstrument {
   		println("Activating keyboard note at (" + x + "," + y + ")");
 	    notes[x][y] = note;
 	    activeCount++;
-      updateAll();
+//      updateAll();
 	  }
 	}
 

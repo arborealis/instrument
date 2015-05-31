@@ -3,9 +3,8 @@
 // Settings to customize can be found in Settings.pde
 
 // features to add
-// * volume control on new node playing
-// * background ambient lower octave repeat of base track
-// * reverb
+// * global instrument volume control based on number of notes playing
+// * only one high pass filter
 
 import ddf.minim.*;
 import ddf.minim.ugens.*;

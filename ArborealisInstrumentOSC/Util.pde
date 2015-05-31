@@ -1,6 +1,7 @@
 
 // load a file from disk; split it evenly or use return to zeros
-MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero) {  
+MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero, 
+  int silenceMinFramesClipSeparation, float silenceValueCutoff) {  
   ArrayList<MultiChannelBuffer> bufs = new ArrayList<MultiChannelBuffer>();    
 
   // load sample
@@ -34,12 +35,12 @@ MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero) {
 
     int bufInd = 0;
     while (bufInd < frames.length) {
-      int startInd = findNextNonSilence(frames, bufInd, SILENCE_VALUE_CUTOFF);
+      int startInd = findNextNonSilence(frames, bufInd, silenceValueCutoff);
       if (startInd == -1)
         break;
       //println("FILE: Found next nonzero=" + startInd);
 
-      int endInd = findNextSilence(frames, startInd, MIN_SILENT_FRAMES_CLIP_SEPARATION, SILENCE_VALUE_CUTOFF);
+      int endInd = findNextSilence(frames, startInd, silenceMinFramesClipSeparation, silenceValueCutoff);
       //println("FILE: Found next multiple zeros=" + endInd);
       if (endInd == -1)
         endInd = frames.length;

@@ -111,7 +111,7 @@ class KeyboardNote implements ArborealisNote
     adsr.noteOn();
   }
   
-  void update(int numNotes) {
+  // void update(int numNotes) {
     //println("NOTE: Updating note");
     // float hpFreq = KeyboardFuncs.highPassFreq(y, z, numNotes);
     // lfo.amplitude.setLastValue(KeyboardSettings.LFO_AMPLITUDE * hpFreq);
@@ -123,6 +123,6 @@ class KeyboardNote implements ArborealisNote
     //                    KeyboardFuncs.adsrDecayTime(y,z,numNotes),
     //                    KeyboardFuncs.adsrSustainLevel(y,z,numNotes),
     //                    KeyboardFuncs.adsrReleaseTime(y,z,numNotes), 0, 0);
-  }
+  // }
   
 }

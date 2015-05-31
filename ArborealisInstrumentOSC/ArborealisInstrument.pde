@@ -2,16 +2,19 @@ ArborealisInstrument instrumentFactory(AudioOutput out, InstrumentType instrumen
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
   if (instrumentType == InstrumentType.grainsynth)
-    return new GrainSynthInstrument(out, parseSampleFile(filename, false));
+    return new GrainSynthInstrument(out, parseSampleFile(filename, false, 0, 0));
   else if (instrumentType == InstrumentType.keyboard)
-    return new KeyboardInstrument(out, parseSampleFile(filename, true));
+    return new KeyboardInstrument(out, parseSampleFile(filename, true, 
+      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF));
   else if (instrumentType == InstrumentType.arpeggio)
-    return new KeyboardInstrument(out, parseSampleFile(filename, true));
+    return new KeyboardInstrument(out, parseSampleFile(filename, true,
+      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF));
   else
     assert(false);
   return null;
 }
 
+// Base class for different instruments
 // keep track of all notes being played by an instrument: where each xy space maps to one possible note
 class ArborealisInstrument {
   protected ArborealisNote[][] notes;
@@ -35,16 +38,16 @@ class ArborealisInstrument {
           notes[x][y].stop();
           notes[x][y] = null;
         }
-    updateAll();
+//    updateAll();
   }
  
-  void updateAll() {
-    //println("INSTRUMENT: updating notes");
-    for (int x = 0; x < NUM_X; x++)
-      for (int y = 0; y < NUM_Y; y++)
-        if (notes[x][y] != null)
-          notes[x][y].update(activeCount);
-  }
+  // void updateAll() {
+  //   //println("INSTRUMENT: updating notes");
+  //   for (int x = 0; x < NUM_X; x++)
+  //     for (int y = 0; y < NUM_Y; y++)
+  //       if (notes[x][y] != null)
+  //         notes[x][y].update(activeCount);
+  // }
 
   MultiChannelBuffer getSample(int x) {
     return bufs[x];
@@ -73,7 +76,7 @@ class ArborealisInstrument {
       }
 
     activeCount++;
-    updateAll();
+//    updateAll();
 
     if (VERBOSE) println("INSTRUMENT: activating note (" + x + "," + y + ")");
     note.start();
@@ -87,7 +90,7 @@ class ArborealisInstrument {
     activeCount--;
     notes[x][y].stop();
     notes[x][y] = null;
-    updateAll();
+//    updateAll();
   }
 
   int numNotes() { return activeCount; }
