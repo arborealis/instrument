@@ -13,6 +13,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	Oscil lfo;
 	Summer summer;
 
+
 	GrainSynthInstrument(AudioOutput out, MultiChannelBuffer[] bufs) {
 		super(InstrumentType.grainsynth, bufs);
 
@@ -72,6 +73,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 
   void activate(int x, int y, float z, ArborealisNote note) {
   	super.activate(x, y, z, note);
+    updateGain();
     updateLFO();
     updateSettings(); // not sure why this is necessary but it removes a nasty audio feedback loop before the first note is played
   }
@@ -79,11 +81,23 @@ class GrainSynthInstrument extends ArborealisInstrument {
 
   void deactivate(int x, int y) {
   	super.deactivate(x, y);
+    updateGain();
     updateLFO();
 	}
 
 
-	void updateSettings() {
+  void updateGain() {
+    int numNotes = constrain(numNotes(), 1, NUM_X);
+    float amplitude = map(numNotes, 1, NUM_X, GrainSynthSettings.ADSR_MAX_AMPLITUDE, GrainSynthSettings.ADSR_MAX_AMPLITUDE/NUM_X);//log(NUM_X));
+
+    for (int x = 0; x < NUM_X; x++)
+      for (int y = 0; y < NUM_Y; y++)
+        if (notes[x][y] != null)
+          notes[x][y].update(amplitude);
+  }
+
+
+	void updateSettings() {    
 	  if (delays == null)
 	    return;
 

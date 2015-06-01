@@ -17,7 +17,7 @@ static final int SLIDER_HEIGHT = 20;
 static final boolean ENABLE_OSC = true;
 
 public class KeyboardSettings {
-  static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
+  static public final float ADSR_MAX_AMPLITUDE = 0.5;       // constant
   static public final float ADSR_MIN_ATTACK_TIME = 0.25;     // function of 1/y
   static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
   static public final float ADSR_DECAY_TIME = 0.25;          // constant
@@ -51,7 +51,7 @@ public class ArpeggioSettings {
 // Config settings for the grain synth instrument. Some of these are constants and others
 // can be modified by on screen controls
 static public class GrainSynthSettings {
-  static public final float ADSR_MAX_AMPLITUDE = 0.25;       // constant
+  static public final float ADSR_MAX_AMPLITUDE = 0.5;
   static public final float ADSR_MIN_ATTACK_TIME = 0.25;     // function of 1/y
   static public final float ADSR_MAX_ATTACK_TIME = 2.0;      // function of 1/y
   static public final float ADSR_DECAY_TIME = 0.25;          // constant

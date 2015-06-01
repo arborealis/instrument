@@ -9,6 +9,7 @@
 interface ArborealisNote {
   void start();
   void stop();
+  void update(float amplitude);
 }
 
 

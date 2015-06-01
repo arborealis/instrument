@@ -5,12 +5,6 @@
 // The KeyboardNote implementation and related functions
 
 static class KeyboardFuncs {
-  public static float adsrMaxAmp(int y, float z) {
-    return KeyboardSettings.ADSR_MAX_AMPLITUDE;
-    // numNotes = constrain(numNotes, 1, NUM_X);
-    // return map(numNotes, 1, NUM_X, KeyboardSettings.ADSR_MAX_AMPLITUDE, KeyboardSettings.ADSR_MAX_AMPLITUDE/log(NUM_X));
-  }
-  
   static float adsrAttackTime(int y, float z) {
     return map(1.0 / y,  1.0/NUM_Y, 1.0, KeyboardSettings.ADSR_MIN_ATTACK_TIME, KeyboardSettings.ADSR_MAX_ATTACK_TIME);
   }
@@ -20,7 +14,6 @@ static class KeyboardFuncs {
   }
   
   static float adsrSustainLevel(int y, float z) {
-    //return log((1.0/numNotes) * ((y * 0.75) + 0.25));
     return y * (1 - KeyboardSettings.ADSR_MIN_SUSTAIN_LEVEL) + KeyboardSettings.ADSR_MIN_SUSTAIN_LEVEL;
   }
   
@@ -52,7 +45,7 @@ class KeyboardNote implements ArborealisNote
   MoogFilter highPass;
   MultiChannelBuffer buf;  // the input buffer containing the whole sample
   float duration;
-  int x, y, numNotes;
+  int x, y;
   float z;
 
   
@@ -64,10 +57,17 @@ class KeyboardNote implements ArborealisNote
     this.x = x;
     this.y = y;
     this.z = z;
-    this.numNotes = numNotes;
     samp = null;
   }
 
+
+  void update(float amplitude) {
+    adsr.setParameters(amplitude, KeyboardFuncs.adsrAttackTime(y, z),
+      KeyboardFuncs.adsrDecayTime(y, z), KeyboardFuncs.adsrSustainLevel(y, z),
+      KeyboardFuncs.adsrReleaseTime(y, z), 1, 1);
+  }
+
+  
   void stop() {
     if (samp != null) {
       println("NOTE: Stopping keyboard at (" + x + "," + y + ")");
@@ -79,6 +79,7 @@ class KeyboardNote implements ArborealisNote
     }
   }
   
+
   // Start the Note.
   void start() {    
     if (samp != null) {
@@ -96,7 +97,7 @@ class KeyboardNote implements ArborealisNote
     samp = new Sampler(buf2, 44100, 1);
           
     // create the ASDR
-    adsr = new ADSR(KeyboardFuncs.adsrMaxAmp(y, z), 
+    adsr = new ADSR(KeyboardSettings.ADSR_MAX_AMPLITUDE,
                     KeyboardFuncs.adsrAttackTime(y, z),
                     KeyboardFuncs.adsrDecayTime(y, z), 
                     KeyboardFuncs.adsrSustainLevel(y, z),

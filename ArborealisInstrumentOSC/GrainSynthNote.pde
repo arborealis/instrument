@@ -5,12 +5,6 @@
 // Definition of GrainSynthNote implementation and related functions
 
 static class GrainSynthFuncs {
-  public static float adsrMaxAmp(int y, float z) {
-    return GrainSynthSettings.ADSR_MAX_AMPLITUDE;
-    // numNotes = constrain(numNotes, 1, NUM_X);
-    // return map(numNotes, 1, NUM_X, GrainSynthSettings.ADSR_MAX_AMPLITUDE, GrainSynthSettings.ADSR_MAX_AMPLITUDE/log(NUM_X));
-  }
-  
   static float adsrAttackTime(int y, float z) {
     return map(1.0 / y,  1.0/NUM_Y, 1.0, GrainSynthSettings.ADSR_MIN_ATTACK_TIME, GrainSynthSettings.ADSR_MAX_ATTACK_TIME);
   }
@@ -66,6 +60,14 @@ class GrainSynthNote implements ArborealisNote
     samp = null;
   }
 
+
+  void update(float amplitude) {
+    adsr.setParameters(amplitude, GrainSynthFuncs.adsrAttackTime(y, z),
+      GrainSynthFuncs.adsrDecayTime(y, z), GrainSynthFuncs.adsrSustainLevel(y, z),
+      GrainSynthFuncs.adsrReleaseTime(y, z), 1, 1);
+  }
+
+
   void stop() {
     if (samp != null) {
       if (VERBOSE) println("NOTE: Stopping grain synth at (" + x + "," + y + ")");
@@ -77,6 +79,7 @@ class GrainSynthNote implements ArborealisNote
     }
   }
   
+
   // Start the Note.
   void start() {    
     if (samp != null) {
@@ -95,7 +98,7 @@ class GrainSynthNote implements ArborealisNote
     samp.looping = true;
           
     // create the ASDR
-    adsr = new ADSR(GrainSynthFuncs.adsrMaxAmp(y, z), 
+    adsr = new ADSR(GrainSynthSettings.ADSR_MAX_AMPLITUDE,
                     GrainSynthFuncs.adsrAttackTime(y, z),
                     GrainSynthFuncs.adsrDecayTime(y, z), 
                     GrainSynthFuncs.adsrSustainLevel(y, z),
@@ -108,4 +111,4 @@ class GrainSynthNote implements ArborealisNote
     samp.trigger();
     adsr.noteOn();
   }  
-}
+};
