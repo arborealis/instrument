@@ -10,8 +10,8 @@ static final int OSC_SEND_PORT = 8000;
 static final int NUM_X = 20;      // how many x sections in the instrument 
 static final int NUM_Y = 10;      // how many y sections in the instrument 
 static final int BPM = 120;
-static final int FPS = 10;       // how many frame per second to run the outer loop
-static final boolean VERBOSE = false;
+static final int FPS = 30;       // how many frame per second to run the outer loop
+static final boolean VERBOSE = true;
 static final int SLIDER_WIDTH = 500;
 static final int SLIDER_HEIGHT = 20;
 static final boolean ENABLE_OSC = true;
@@ -75,14 +75,14 @@ static public class GrainSynthSettings {
   static public final float REVERB_TIME2 = 1/32.0;
   static public final float REVERB_TIME3 = 3/64.0;
   static public final float REVERB_TIME4 = 1/8.0;
-  static public float REVERB_DRY_AMP_DB = 0;
-  static public float REVERB_WET_AMP_DB = 28;
-  static public float REVERB_WET_SHIFTED_AMP_DB = 75;
-  static public float REVERB_WET_SHIFTED_FACTOR = 4;
+  static public float REVERB_DRY_AMP_DB = -15;
+  static public float REVERB_WET_AMP_DB = 0;
+  static public float REVERB_WET_SHIFTED_AMP_DB = 60;
+  static public float REVERB_WET_SHIFTED_FACTOR = 3;
 
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
-  static public final String USE_FILE = "../samples/grain.wav";
-  //static public final String USE_FILE = "";
+  //static public final String USE_FILE = "../samples/vsonar.wav";
+  static public final String USE_FILE = "";
 }
 //////////// End of parameters to edit ////////////
 

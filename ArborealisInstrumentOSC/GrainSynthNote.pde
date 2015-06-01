@@ -1,5 +1,5 @@
 /*
- * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ * MIT License. Copyright (c) 2015 Greg Friedland
  */
 
 // Definition of GrainSynthNote implementation and related functions

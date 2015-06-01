@@ -1,5 +1,5 @@
 /*
- * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ * MIT License. Copyright (c) 2015 Greg Friedland
  */
 
 // Main file for the ArborealisInstrumentOSC sketch
@@ -65,7 +65,7 @@ void setup()
   createControls();
   
   // debugging: play a note on startup
-  instruments[0].activate(1, 9, 0, noteFactory(instruments[0], 1, 9, 0));
+  //instruments[0].activate(1, 9, 0, noteFactory(instruments[0], 1, 9, 0));
 }
 
 

@@ -1,6 +1,7 @@
 /*
- * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ * MIT License. Copyright (c) 2015 Greg Friedland
  */
+
 
 // Provides on screen controls for some settings and handles the events
 // for these controls
@@ -56,6 +57,8 @@ void controlEvent(ControlEvent theEvent) {
   GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY = grainsynth_high_pass_max_frequency;
   GrainSynthSettings.HIGH_PASS_RESONANCE = grainsynth_high_pass_resonance;
 
-  for (ArborealisInstrument instrument : instruments)
-    instrument.updateSettings();
+  for (ArborealisInstrument instrument : instruments) {
+    if (instrument != null)
+      instrument.updateSettings();
+  }
 }

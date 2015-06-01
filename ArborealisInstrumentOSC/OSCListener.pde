@@ -183,18 +183,19 @@ class OSCListener implements OscEventListener {
     NetAddress address2 = new NetAddress(address.address(), OSC_SEND_PORT);
     
     println("Sending reset to " + address2.toString());
-    for (InstrumentType it : InstrumentType.values())
-      for (Command cmd : Command.values())
-        for (int x = 0; x < NUM_X; x++) {
-          for (int y = 0; y < NUM_Y; y++) {
-            String path = "/" + it + "/" + cmd;
-            OscMessage msg = new OscMessage(path);
-            msg.add(x);
-            msg.add(y);
-            msg.add(0);
-            println("Sending: " + msg.toString()); 
-            oscP5.send(msg, address2);
-          }
+    for (InstrumentType it : InstrumentType.values()) {
+      String cmd = "setone";
+      for (int x = 0; x < NUM_X; x++) {
+        for (int y = 0; y < NUM_Y; y++) {
+          String path = "/" + it + "/" + cmd;
+          OscMessage msg = new OscMessage(path);
+          msg.add(x);
+          msg.add(y);
+          msg.add(0);
+          println("Sending: " + msg.toString()); 
+          oscP5.send(msg, address2);
         }
+      }
+    }
   }  
 }

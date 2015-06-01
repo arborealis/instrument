@@ -24,7 +24,7 @@ NetAddress sendAddress;
 void setup()
 {
   // call the draw() method at 30fps
-  frameRate(30);
+  frameRate(1);
   
   // create the graphics window
   size( WIDTH, WIDTH/NUM_INST*NUM_Y/NUM_X, P2D );

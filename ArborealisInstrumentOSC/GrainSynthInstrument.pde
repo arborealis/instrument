@@ -1,5 +1,5 @@
 /*
- * MIT License. Copyright (c) 2015 Greg Friedland.
+ * MIT License. Copyright (c) 2015 Greg Friedland
  */
 
 // Definition of GrainSynthInstrument class which controls the individual notes made by each player on

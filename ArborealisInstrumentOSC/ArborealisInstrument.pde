@@ -1,6 +1,7 @@
 /*
- * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ * MIT License. Copyright (c) 2015 Greg Friedland
  */
+
 
 // Definition of the ArborealisInstrument abstract base class from which 
 // GrainSynthInstrument and KeyboardInstrument are inherited
