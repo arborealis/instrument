@@ -1,3 +1,9 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland.
+ */
+
+// Simulated the arborealis vision subsystem by generating OSC messages in the proper format.
+
 import oscP5.*;
 import netP5.*;
 

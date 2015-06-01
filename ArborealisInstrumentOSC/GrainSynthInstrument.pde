@@ -1,3 +1,10 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland.
+ */
+
+// Definition of GrainSynthInstrument class which controls the individual notes made by each player on
+// this instrument and the output UGens common to all its notes.
+
 class GrainSynthInstrument extends ArborealisInstrument {
 	Delay[] delays;
 	MoogFilter highPass;
@@ -59,7 +66,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 
   // change the mean and amplitude of the LFO feeding into the high pass filter
   // to reflect any changes in the number of notes
-	void updateLFO() {
+  void updateLFO() {
   	float hpFreq = GrainSynthFuncs.highPassFreq(numNotes());
   	lfo.frequency.setLastValue(GrainSynthSettings.LFO_FREQUENCY);
     lfo.amplitude.setLastValue(GrainSynthSettings.LFO_AMPLITUDE * hpFreq);

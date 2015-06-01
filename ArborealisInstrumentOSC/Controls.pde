@@ -1,5 +1,13 @@
+/*
+ * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ */
+
+// Provides on screen controls for some settings and handles the events
+// for these controls
+
 ControlP5 cp5;
 
+// ControlP5 requires simple global variables to work 
 float grainsynth_reverb_amp1 = GrainSynthSettings.REVERB_AMP1;
 float grainsynth_reverb_amp2 = GrainSynthSettings.REVERB_AMP2;
 float grainsynth_reverb_amp3 = GrainSynthSettings.REVERB_AMP3;
@@ -32,6 +40,7 @@ void createControls() {
   cp5.addSlider("grainsynth_high_pass_resonance", 0, 1).setSize(SLIDER_WIDTH,SLIDER_HEIGHT).linebreak();
 }
 
+// Handle a control event such as a slider drag
 void controlEvent(ControlEvent theEvent) {
   GrainSynthSettings.REVERB_AMP1 = grainsynth_reverb_amp1;
   GrainSynthSettings.REVERB_AMP2 = grainsynth_reverb_amp2;

@@ -1,3 +1,11 @@
+/*
+ * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ */
+
+// Definition of the ArborealisInstrument abstract base class from which 
+// GrainSynthInstrument and KeyboardInstrument are inherited
+
+// Factory function for creating an instrument of the correct type
 ArborealisInstrument instrumentFactory(AudioOutput out, InstrumentType instrumentType, String filename) {
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
@@ -38,16 +46,7 @@ class ArborealisInstrument {
           notes[x][y].stop();
           notes[x][y] = null;
         }
-//    updateAll();
   }
- 
-  // void updateAll() {
-  //   //println("INSTRUMENT: updating notes");
-  //   for (int x = 0; x < NUM_X; x++)
-  //     for (int y = 0; y < NUM_Y; y++)
-  //       if (notes[x][y] != null)
-  //         notes[x][y].update(activeCount);
-  // }
 
   MultiChannelBuffer getSample(int x) {
     return bufs[x];
@@ -76,7 +75,6 @@ class ArborealisInstrument {
       }
 
     activeCount++;
-//    updateAll();
 
     if (VERBOSE) println("INSTRUMENT: activating note (" + x + "," + y + ")");
     note.start();
@@ -90,7 +88,6 @@ class ArborealisInstrument {
     activeCount--;
     notes[x][y].stop();
     notes[x][y] = null;
-//    updateAll();
   }
 
   int numNotes() { return activeCount; }

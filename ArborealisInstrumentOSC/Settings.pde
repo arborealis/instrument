@@ -1,3 +1,9 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland
+ */
+
+// Settings global to the program as well as specific to each instrument.
+
 //////////// Start of parameters to edit ////////////
 static final int OSC_RECEIVE_PORT = 7000;
 static final int OSC_SEND_PORT = 8000;

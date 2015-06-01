@@ -1,5 +1,8 @@
- // Main file for the ArborealisInstrumentOSC sketch
+/*
+ * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ */
 
+// Main file for the ArborealisInstrumentOSC sketch
 // Settings to customize can be found in Settings.pde
 
 // features to add
@@ -27,6 +30,7 @@ InstrumentSettings[] instrumentSettings = new InstrumentSettings[]
     new InstrumentSettings(ArpeggioSettings.USE_FILE) };
 
 OscP5 oscP5;
+
 
 // setup is run once at the beginning
 void setup()
@@ -75,6 +79,7 @@ void create_instrument(AudioOutput out, InstrumentType instrumentType, File file
   }
 }
 
+
 // This code is called by the selectInput() method when a file has been selected
 void create_grainsynth(File file) {
   create_instrument(out, InstrumentType.grainsynth, file);
@@ -93,29 +98,18 @@ void triggerBeat() {
       instrument.trigger();
 }
 
-// draw the music visualizer to the screen
+
 void draw()
 {
+  // trigger beats on the BPM schedule
   if (millis() - lastBeatTime >= 60000 / BPM) {
     triggerBeat();
     lastBeatTime = millis();
   }
 
-  // erase the window to black
   background( 0 );
-  // // draw using a black stroke
-  // stroke( 0 );
-  // // draw the waveforms
-  // for( int i = 0; i < out.bufferSize() - 1; i++ )
-  // {
-  //   // find the x position of each buffer value
-  //   float x1  =  map( i, 0, out.bufferSize(), 0, width );
-  //   float x2  =  map( i+1, 0, out.bufferSize(), 0, width );
-  //   // draw a line from one buffer position to the next for both channels
-  //   line( x1, 50 + out.left.get(i)*50, x2, 50 + out.left.get(i+1)*50);
-  //   line( x1, 150 + out.right.get(i)*50, x2, 150 + out.right.get(i+1)*50);
-  // }  
 }
+
 
 void keyPressed() {
   if (key == ' ') {

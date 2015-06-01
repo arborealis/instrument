@@ -1,3 +1,9 @@
+/*
+ * MIT License (MIT). Copyright (c) 2015 Greg Friedland
+ */
+
+// Definition of GrainSynthNote implementation and related functions
+
 static class GrainSynthFuncs {
   public static float adsrMaxAmp(int y, float z, int numNotes) {
     numNotes = constrain(numNotes, 1, NUM_X);

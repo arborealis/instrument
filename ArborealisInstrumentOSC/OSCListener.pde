@@ -1,5 +1,11 @@
-import netP5.*;
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland
+ */
 
+// OSC listening and event handling
+
+
+import netP5.*;
 
 // Manage parsing of OSC messages
 class OSCListener implements OscEventListener {

@@ -1,3 +1,8 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland.
+ */
+
+// Utilities for parsing and processing sample sound files
 
 // load a file from disk; split it evenly or use return to zeros
 MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero, 

@@ -1,3 +1,9 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland
+ */
+
+// The KeyboardNote implementation and related functions
+
 static class KeyboardFuncs {
   public static float adsrMaxAmp(int y, float z, int numNotes) {
     numNotes = constrain(numNotes, 1, NUM_X);

@@ -1,3 +1,7 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland.
+ */
+
 import ddf.minim.*;
 import ddf.minim.ugens.*;
 import controlP5.*;

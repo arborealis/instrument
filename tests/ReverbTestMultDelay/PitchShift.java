@@ -1,3 +1,12 @@
+/*
+ * MIT License. Copyright (c) 2015 Greg Friedland.
+ * Adapted from ddf.minim.ugens.Vocoder.java by Damien Di Fede.
+ */
+
+// A UGen to shift the pitch of an audio stream without changing it's speed
+// Uses FFT and a frequency shift factor (FSF) which translates the amplitude at
+// all frequencies f to frequencies FSF*f.
+
 import ddf.minim.UGen;
 import ddf.minim.analysis.FFT;
 
@@ -5,7 +14,6 @@ import ddf.minim.analysis.FFT;
 public class PitchShift extends UGen
 {
 	public UGenInput	audio;
-	//public UGenInput	modulator;
 	public UGenInput    shiftFactor;
 
 	// the window size we use for analysis
@@ -16,8 +24,6 @@ public class PitchShift extends UGen
 	private int			m_windowSpacing;
 	// the sample data from audio
 	private float[]		m_audioSamples;
-	// the sample data from carrier
-	// private float[]		m_modulatorSamples;
 	// our output
 	private float[]		m_outputSamples;
 	// where we are in our sampling arrays
@@ -33,37 +39,10 @@ public class PitchShift extends UGen
 
 	// used to analyze the audio input
 	private FFT			m_audioFFT;
-	// used to analyze the modulator input
-	//private FFT			m_modulatorFFT;
 
-	/**
-	 * Constructs a Vocoder.
-	 * 
-	 * @param windowSize
-	 * 			int: the number of sample frames to use for 
-	 * 				 each FFT analysis. Smaller window sizes 
-	 * 				 will have better performance, but lower
-	 * 				 sound quality. the window size must also 
-	 * 				 be a power of two, which is a requirement 
-	 * 				 for using an FFT.
-	 * 
-	 * @param windowCount
-	 * 			int: the number of overlapping windows to use. 
-	 * 				 this must be at least 1 with larger values
-	 * 				 causing the analysis windows to overlap 
-	 * 				 with each other to a greater degree.
-	 * 				 For instance, with a windowSize of 1024 and 
-	 * 				 a windowCount of 2, a 1024 sample frame FFT 
-	 * 				 will be calculated every 512 sample frames. 
-	 * 				 With 3 windows, every 341 samples, and so forth.
-	 * 				 More windows generally equates to better quality.
-	 * 
-	 *  @related Vocoder
-	 */
 	public PitchShift(float _shiftFactor, int windowSize, int windowCount)
 	{
 		audio = new UGenInput( InputType.AUDIO );
-		//modulator = new UGenInput( InputType.AUDIO );
 		shiftFactor = addControl(_shiftFactor);
 
 		float overlapPercent = 1.f;
@@ -77,7 +56,6 @@ public class PitchShift extends UGen
 		m_windowSpacing = (int)( windowSize * overlapPercent );
 		int bufferSize = m_windowSize * 2 - m_windowSpacing;
 		m_audioSamples = new float[bufferSize];
-		// m_modulatorSamples = new float[bufferSize];
 		m_outputSamples = new float[bufferSize];
 		m_analysisSamples = new float[windowSize];
 		m_index = 0;
@@ -90,8 +68,6 @@ public class PitchShift extends UGen
 	{
 		m_audioFFT = new FFT( m_windowSize, sampleRate() );
 		m_audioFFT.window( FFT.HANN );
-		// m_modulatorFFT = new FFT( m_windowSize, sampleRate() );
-		// m_modulatorFFT.window( FFT.HAMMING );
 	}
 
 	private void analyze(FFT fft, float[] src)
@@ -107,7 +83,6 @@ public class PitchShift extends UGen
 	protected void uGenerate(float[] out)
 	{
 		m_audioSamples[m_index] = audio.getLastValue();
-		//m_modulatorSamples[m_index] = modulator.getLastValue();
 		++m_index;
 		--m_triggerCount;
 		if ( m_index == m_audioSamples.length )
@@ -119,7 +94,6 @@ public class PitchShift extends UGen
 		if ( m_triggerCount == 0 )
 		{
 			analyze( m_audioFFT, m_audioSamples );
-			//analyze( m_modulatorFFT, m_modulatorSamples );
 
 			// store the band amplitude info
 			float[] tmp = new float[m_audioFFT.specSize()];
