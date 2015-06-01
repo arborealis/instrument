@@ -11,13 +11,13 @@ ArborealisInstrument instrumentFactory(AudioOutput out, InstrumentType instrumen
   InstrumentSettings settings = instrumentSettings[instrumentType.ordinal()];
 
   if (instrumentType == InstrumentType.grainsynth)
-    return new GrainSynthInstrument(out, parseSampleFile(filename, false, 0, 0));
+    return new GrainSynthInstrument(out, parseSampleFile(filename, false, 0, 0, GrainSynthSettings.CLIP_MAX_AMPLITUDE));
   else if (instrumentType == InstrumentType.keyboard)
     return new KeyboardInstrument(out, parseSampleFile(filename, true, 
-      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF));
+      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF, KeyboardSettings.CLIP_MAX_AMPLITUDE));
   else if (instrumentType == InstrumentType.arpeggio)
     return new KeyboardInstrument(out, parseSampleFile(filename, true,
-      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF));
+      KeyboardSettings.SILENCE_MIN_FRAMES_CLIP_SEPARATION, KeyboardSettings.SILENCE_VALUE_CUTOFF, KeyboardSettings.CLIP_MAX_AMPLITUDE));
   else
     assert(false);
   return null;

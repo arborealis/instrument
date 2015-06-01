@@ -14,14 +14,15 @@ interface ArborealisNote {
 
 // Factory function to create a note of the correct type for the given instrument
 ArborealisNote noteFactory(ArborealisInstrument instrument, int x, int y, float z) {
+  ArborealisNote note = null;
   if (instrument.type() == InstrumentType.grainsynth)
-	return new GrainSynthNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
+  	note = new GrainSynthNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else if (instrument.type() == InstrumentType.keyboard)
-	return new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
+	  note = new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else if (instrument.type() == InstrumentType.arpeggio)
-	return new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
+	  note = new KeyboardNote(instrument.getOutUgen(), x, y, z, instrument.numNotes(), instrument.getSample(x));
   else
   	assert(false);
 
-  return null;
+  return note;
 }

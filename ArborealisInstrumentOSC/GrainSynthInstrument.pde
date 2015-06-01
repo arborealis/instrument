@@ -47,10 +47,6 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  delays[2].setDelTime(GrainSynthSettings.REVERB_TIME3);
 	  delays[3].setDelTime(GrainSynthSettings.REVERB_TIME4);
 
-	  // a placeholder ugen; FIX is this necessary?
-	  Line silence = new Line(1, 0, 0);
-	  silence.patch(outUgen);
-
 	  // patching the reverb wet
 	  outUgen.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPass).patch(wetGain).patch(summer);
 
@@ -58,7 +54,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  delays[3].patch(pitchShift).patch(wetShiftedGain).patch(summer);
 
 	  // patching the original signal
-	  silence.patch(outUgen).patch(dryGain).patch(summer);
+	  outUgen.patch(dryGain).patch(summer);
 
 	  summer.patch(out);
 	}
@@ -77,6 +73,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
   void activate(int x, int y, float z, ArborealisNote note) {
   	super.activate(x, y, z, note);
     updateLFO();
+    updateSettings(); // not sure why this is necessary but it removes a nasty audio feedback loop before the first note is played
   }
 
 

@@ -31,7 +31,8 @@ public class KeyboardSettings {
   static public final float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
 
   static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
-  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
+  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the longest clip to repeat
+  static final float CLIP_MAX_AMPLITUDE = 0.5;               // how loud should the max clip volume be
 
   static final int SILENCE_MIN_FRAMES_CLIP_SEPARATION = 1000; // min number of frames with value==0, used to separate clips
   static final float SILENCE_VALUE_CUTOFF = 0.01;            // sound values below this number are considered silence
@@ -65,7 +66,8 @@ static public class GrainSynthSettings {
   static public float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
 
   static public final float CLIP_MIN_FRACTIONAL_LENGTH = 0.5;// how long to make the shortest clip to repeat
-  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the shortest clip to repeat
+  static public final float CLIP_MAX_FRACTIONAL_LENGTH = 1;  // how long to make the longest clip to repeat
+  static final float CLIP_MAX_AMPLITUDE = 0.5;               // how loud should the max clip volume be
 
   static public float REVERB_AMP1 = 0.15;
   static public float REVERB_AMP2 = 0.22;
@@ -75,10 +77,10 @@ static public class GrainSynthSettings {
   static public final float REVERB_TIME2 = 1/32.0;
   static public final float REVERB_TIME3 = 3/64.0;
   static public final float REVERB_TIME4 = 1/8.0;
-  static public float REVERB_DRY_AMP_DB = -15;
-  static public float REVERB_WET_AMP_DB = 0;
-  static public float REVERB_WET_SHIFTED_AMP_DB = 60;
-  static public float REVERB_WET_SHIFTED_FACTOR = 3;
+  static public float REVERB_DRY_AMP_DB = -25;
+  static public float REVERB_WET_AMP_DB = 15;
+  static public float REVERB_WET_SHIFTED_AMP_DB = 53;
+  static public float REVERB_WET_SHIFTED_FACTOR = 4;
 
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
   //static public final String USE_FILE = "../samples/vsonar.wav";

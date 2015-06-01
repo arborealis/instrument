@@ -4,9 +4,11 @@
 
 // Utilities for parsing and processing sample sound files
 
+import java.util.Collections;
+
 // load a file from disk; split it evenly or use return to zeros
 MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero, 
-  int silenceMinFramesClipSeparation, float silenceValueCutoff) {  
+  int silenceMinFramesClipSeparation, float silenceValueCutoff, float maxAmplitude) {  
   ArrayList<MultiChannelBuffer> bufs = new ArrayList<MultiChannelBuffer>();    
 
   // load sample
@@ -27,6 +29,13 @@ MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero,
       for (int c = 0; c < nc; c++) {
         float[] frames = mainBuf.getChannel(c);
         float[] subFrames = Arrays.copyOfRange(frames, s*nfSub, (s+1)*nfSub);
+
+        // scale all clips to have the same max amplitude
+        float maxPrevAmp = max(subFrames);
+        println("FILE: before scaling max of buffer=" + s + " channel=" + c + ": " +  maxPrevAmp);
+        for (int i = 0; i < subFrames.length; i++)
+          subFrames[i] *= maxAmplitude / maxPrevAmp;
+
         buf.setChannel(c, subFrames);
       }
       bufs.add(buf);
@@ -51,7 +60,15 @@ MultiChannelBuffer[] parseSampleFile(String filename, boolean useReturnToZero,
         endInd = frames.length;
 
       MultiChannelBuffer buf = new MultiChannelBuffer(endInd - startInd, 1);
-      buf.setChannel(0, Arrays.copyOfRange(frames, startInd, endInd));
+      float[] subFrames = Arrays.copyOfRange(frames, startInd, endInd);
+
+      // scale all clips to have the same max amplitude
+      float maxPrevAmp = max(subFrames);
+      println("FILE: before scaling max of buffer=" + bufs.size() + ": " +  maxPrevAmp);
+      for (int i = 0; i < subFrames.length; i++)
+        subFrames[i] *= maxAmplitude / maxPrevAmp;
+
+      buf.setChannel(0, subFrames);
       bufs.add(buf);
 
       bufInd = endInd;
@@ -246,27 +263,14 @@ MultiChannelBuffer getSubBuffer(MultiChannelBuffer buf, int start, int length) {
   float[] frames = buf.getChannel(0);
     
   frames = Arrays.copyOfRange(frames, start, start+length);
-//    if (c == 0) printArray("orig", frames, 5);
     
   frames = removeDCoffset(frames);
-//    if (c == 0) printArray("DCoffset", frames, 5);
     
   frames = trimToZeroCrossings(frames);
-//    if (c == 0) printArray("postTrim", frames, 5);
-    
-//    if (c == 0) printArray("apendReverse", frames, 5);
 
-    //frames = ramp(frames, rampFrames);
-
-     frames = applyWindow(frames);
+  frames = applyWindow(frames);
 
   frames = appendMirroredReverse(frames, false);
-    //frames = addBlanksBefore(frames, frames.length - 2*rampFrames);
-
-    //if (firstClip)
-//      frames = rotate(frames, -frames.length/2+rampFrames);
-//    else
-//      frames = rotate(frames, rampFrames);
 
   bufOut.setBufferSize(frames.length);
   for (int c = 0; c < nc; c++) {      
@@ -274,3 +278,4 @@ MultiChannelBuffer getSubBuffer(MultiChannelBuffer buf, int start, int length) {
   }
   return bufOut;
 }
+

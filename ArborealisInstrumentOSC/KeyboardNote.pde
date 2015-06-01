@@ -5,29 +5,30 @@
 // The KeyboardNote implementation and related functions
 
 static class KeyboardFuncs {
-  public static float adsrMaxAmp(int y, float z, int numNotes) {
-    numNotes = constrain(numNotes, 1, NUM_X);
-    return map(numNotes, 1, NUM_X, KeyboardSettings.ADSR_MAX_AMPLITUDE, KeyboardSettings.ADSR_MAX_AMPLITUDE/log(NUM_X));
+  public static float adsrMaxAmp(int y, float z) {
+    return KeyboardSettings.ADSR_MAX_AMPLITUDE;
+    // numNotes = constrain(numNotes, 1, NUM_X);
+    // return map(numNotes, 1, NUM_X, KeyboardSettings.ADSR_MAX_AMPLITUDE, KeyboardSettings.ADSR_MAX_AMPLITUDE/log(NUM_X));
   }
   
-  static float adsrAttackTime(int y, float z, int numNotes) {
+  static float adsrAttackTime(int y, float z) {
     return map(1.0 / y,  1.0/NUM_Y, 1.0, KeyboardSettings.ADSR_MIN_ATTACK_TIME, KeyboardSettings.ADSR_MAX_ATTACK_TIME);
   }
 
-  static float adsrDecayTime(int y, float z, int numNotes) {
+  static float adsrDecayTime(int y, float z) {
     return KeyboardSettings.ADSR_DECAY_TIME;
   }
   
-  static float adsrSustainLevel(int y, float z, int numNotes) {
+  static float adsrSustainLevel(int y, float z) {
     //return log((1.0/numNotes) * ((y * 0.75) + 0.25));
     return y * (1 - KeyboardSettings.ADSR_MIN_SUSTAIN_LEVEL) + KeyboardSettings.ADSR_MIN_SUSTAIN_LEVEL;
   }
   
-  static float adsrReleaseTime(int y, float z, int numNotes) {
+  static float adsrReleaseTime(int y, float z) {
     return map(y, 1.0, NUM_Y, KeyboardSettings.ADSR_MIN_RELEASE_TIME, KeyboardSettings.ADSR_MAX_RELEASE_TIME);
   }    
 
-  static float highPassFreq(int y, float z, int numNotes) {
+  static float highPassFreq(int numNotes) {
     numNotes = constrain(numNotes, 1, NUM_X);
     return map(numNotes, 1, NUM_X, 
       KeyboardSettings.HIGH_PASS_MIN_FREQUENCY, KeyboardSettings.HIGH_PASS_MAX_FREQUENCY);
@@ -95,11 +96,11 @@ class KeyboardNote implements ArborealisNote
     samp = new Sampler(buf2, 44100, 1);
           
     // create the ASDR
-    adsr = new ADSR(KeyboardFuncs.adsrMaxAmp(y, z, numNotes), 
-                    KeyboardFuncs.adsrAttackTime(y, z, numNotes),
-                    KeyboardFuncs.adsrDecayTime(y, z, numNotes), 
-                    KeyboardFuncs.adsrSustainLevel(y, z, numNotes),
-                    KeyboardFuncs.adsrReleaseTime(y, z, numNotes)); 
+    adsr = new ADSR(KeyboardFuncs.adsrMaxAmp(y, z), 
+                    KeyboardFuncs.adsrAttackTime(y, z),
+                    KeyboardFuncs.adsrDecayTime(y, z), 
+                    KeyboardFuncs.adsrSustainLevel(y, z),
+                    KeyboardFuncs.adsrReleaseTime(y, z)); 
 
     // create the LFO high pass filter
     // lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, 
