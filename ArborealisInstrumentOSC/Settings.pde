@@ -59,9 +59,9 @@ static public class GrainSynthSettings {
   static public final float ADSR_MIN_RELEASE_TIME = 0.2;     // function of y
   static public final float ADSR_MAX_RELEASE_TIME = 1;       // function of y
 
-  static public int HIGH_PASS_MIN_FREQUENCY = 200;
-  static public int HIGH_PASS_MAX_FREQUENCY = 4000;
-  static public float HIGH_PASS_RESONANCE = 0;
+  static public int LFO_HIGHPASS_MIN_FREQUENCY = 200;
+  static public int LFO_HIGHPASS_MAX_FREQUENCY = 4000;
+  static public float LFO_HIGHPASS_RESONANCE = 0;
   static public float LFO_AMPLITUDE = 0.2;             // the lfo range: percentage of the high pass frequency
   static public float LFO_FREQUENCY = 0.2;             // how fast does the LFO change
 
@@ -77,10 +77,12 @@ static public class GrainSynthSettings {
   static public final float REVERB_TIME2 = 1/32.0;
   static public final float REVERB_TIME3 = 3/64.0;
   static public final float REVERB_TIME4 = 1/8.0;
-  static public float REVERB_DRY_AMP_DB = -25;
-  static public float REVERB_WET_AMP_DB = 15;
-  static public float REVERB_WET_SHIFTED_AMP_DB = 53;
+  static public int REVERB_DRY_AMP_DB = -25;
+  static public int REVERB_WET_AMP_DB = 15;
+  static public int REVERB_WET_SHIFTED_AMP_DB = 53;
   static public float REVERB_WET_SHIFTED_FACTOR = 4;
+  static public int REVERB_WET_HIGHPASS_FREQUENCY = 1000;
+  static public float REVERB_WET_HIGHPASS_RESONANCE = 0;
 
   // Uncomment one of the lines below to load from a default file or trigger the file dialog, respectively.
   //static public final String USE_FILE = "../samples/vsonar.wav";

@@ -7,7 +7,7 @@
 
 class GrainSynthInstrument extends ArborealisInstrument {
 	Delay[] delays;
-	MoogFilter highPass;
+	MoogFilter highPassWet, highPassAll;
 	Gain dryGain, wetGain, wetShiftedGain;
 	PitchShift pitchShift;
 	Oscil lfo;
@@ -23,11 +23,15 @@ class GrainSynthInstrument extends ArborealisInstrument {
     // the final ugen to pass to AudioOutput
     summer = new Summer();
 
-    // create the LFO feeding into a high pass filter
+    // the overall highpass filter
+    highPassWet = new MoogFilter(GrainSynthSettings.REVERB_WET_HIGHPASS_FREQUENCY, 
+    	GrainSynthSettings.REVERB_WET_HIGHPASS_RESONANCE, MoogFilter.Type.HP);
+
+    // create the LFO feeding into a high pass filter operating over the whole output
     lfo = new Oscil(GrainSynthSettings.LFO_FREQUENCY, GrainSynthSettings.LFO_AMPLITUDE, Waves.SINE);
     updateLFO();
-    highPass = new MoogFilter(1, GrainSynthSettings.HIGH_PASS_RESONANCE, MoogFilter.Type.HP);
-    lfo.patch(highPass.frequency);
+    highPassAll = new MoogFilter(1, GrainSynthSettings.LFO_HIGHPASS_RESONANCE, MoogFilter.Type.HP);
+    lfo.patch(highPassAll.frequency);
 	      
 	  // Ugen to do pitch-shifting on the wet reverb output
 	  pitchShift = new PitchShift(GrainSynthSettings.REVERB_WET_SHIFTED_FACTOR, 2048, 3);
@@ -49,7 +53,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  delays[3].setDelTime(GrainSynthSettings.REVERB_TIME4);
 
 	  // patching the reverb wet
-	  outUgen.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPass).patch(wetGain).patch(summer);
+	  outUgen.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPassWet).patch(wetGain).patch(summer);
 
 	  // patching the shifted reverb wet
 	  delays[3].patch(pitchShift).patch(wetShiftedGain).patch(summer);
@@ -57,14 +61,14 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  // patching the original signal
 	  outUgen.patch(dryGain).patch(summer);
 
-	  summer.patch(out);
+	  summer.patch(highPassAll).patch(out);
 	}
 
 
   // change the mean and amplitude of the LFO feeding into the high pass filter
   // to reflect any changes in the number of notes
   void updateLFO() {
-  	float hpFreq = GrainSynthFuncs.highPassFreq(numNotes());
+  	float hpFreq = GrainSynthFuncs.lfoHighPassFreq(numNotes());
   	lfo.frequency.setLastValue(GrainSynthSettings.LFO_FREQUENCY);
     lfo.amplitude.setLastValue(GrainSynthSettings.LFO_AMPLITUDE * hpFreq);
     lfo.offset.setLastValue(hpFreq);		
@@ -107,12 +111,14 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  delays[3].setDelAmp(GrainSynthSettings.REVERB_AMP4);
 
 	  updateLFO();
-	  highPass.resonance.setLastValue(GrainSynthSettings.HIGH_PASS_RESONANCE);
+	  highPassAll.resonance.setLastValue(GrainSynthSettings.LFO_HIGHPASS_RESONANCE);
 
 	  dryGain.setValue(GrainSynthSettings.REVERB_DRY_AMP_DB);
 	  wetGain.setValue(GrainSynthSettings.REVERB_WET_AMP_DB);
 	  wetShiftedGain.setValue(GrainSynthSettings.REVERB_WET_SHIFTED_AMP_DB);
 
 	  pitchShift.shiftFactor.setLastValue(GrainSynthSettings.REVERB_WET_SHIFTED_FACTOR);		
+
+	  highPassWet.frequency.setLastValue(GrainSynthSettings.REVERB_WET_HIGHPASS_FREQUENCY);
 	}
 }

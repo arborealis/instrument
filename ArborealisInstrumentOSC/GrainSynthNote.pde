@@ -22,10 +22,10 @@ static class GrainSynthFuncs {
     return map(y, 1.0, NUM_Y, GrainSynthSettings.ADSR_MIN_RELEASE_TIME, GrainSynthSettings.ADSR_MAX_RELEASE_TIME);
   }    
 
-  static float highPassFreq(int numNotes) {
+  static float lfoHighPassFreq(int numNotes) {
     numNotes = constrain(numNotes, 1, NUM_X);
     return map(numNotes, 1, NUM_X, 
-      GrainSynthSettings.HIGH_PASS_MIN_FREQUENCY, GrainSynthSettings.HIGH_PASS_MAX_FREQUENCY);
+      GrainSynthSettings.LFO_HIGHPASS_MIN_FREQUENCY, GrainSynthSettings.LFO_HIGHPASS_MAX_FREQUENCY);
   }
 
   static float clipDuration(int y) {

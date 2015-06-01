@@ -39,11 +39,11 @@ void setup()
   frameRate(FPS);
   
   // create the graphics window
-  size( 700, 400, P2D );
+  size(800, 400, P2D);
   
   // create the audio synthesis instance and the AudioOutput instance
-  minim = new Minim( this );
-  out = minim.getLineOut( Minim.MONO, 2048 );  
+  minim = new Minim(this);
+  out = minim.getLineOut(Minim.MONO, 2048);  
 
   // trigger the open file dialog or load the files directly
   for (InstrumentType instrumentType : InstrumentType.values()) {
