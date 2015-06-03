@@ -52,16 +52,18 @@ class GrainSynthInstrument extends ArborealisInstrument {
 	  delays[2].setDelTime(GrainSynthSettings.REVERB_TIME3);
 	  delays[3].setDelTime(GrainSynthSettings.REVERB_TIME4);
 
+	  outUgen.patch(highPassAll);
+
 	  // patching the reverb wet
-	  outUgen.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPassWet).patch(wetGain).patch(summer);
+	  highPassAll.patch(delays[0]).patch(delays[1]).patch(delays[2]).patch(delays[3]).patch(highPassWet).patch(wetGain).patch(summer);
 
 	  // patching the shifted reverb wet
 	  delays[3].patch(pitchShift).patch(wetShiftedGain).patch(summer);
 
 	  // patching the original signal
-	  outUgen.patch(dryGain).patch(summer);
+	  highPassAll.patch(dryGain).patch(summer);
 
-	  summer.patch(highPassAll).patch(out);
+	  summer.patch(out);
 	}
 
 
@@ -92,7 +94,7 @@ class GrainSynthInstrument extends ArborealisInstrument {
 
   void updateGain() {
     int numNotes = constrain(numNotes(), 1, NUM_X);
-    float amplitude = map(numNotes, 1, NUM_X, GrainSynthSettings.ADSR_MAX_AMPLITUDE, GrainSynthSettings.ADSR_MAX_AMPLITUDE/NUM_X);//log(NUM_X));
+    float amplitude = GrainSynthSettings.ADSR_MAX_AMPLITUDE / numNotes;
 
     for (int x = 0; x < NUM_X; x++)
       for (int y = 0; y < NUM_Y; y++)

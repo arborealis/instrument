@@ -80,7 +80,7 @@ static public class GrainSynthSettings {
   static public int REVERB_DRY_AMP_DB = -25;
   static public int REVERB_WET_AMP_DB = 15;
   static public int REVERB_WET_SHIFTED_AMP_DB = 53;
-  static public float REVERB_WET_SHIFTED_FACTOR = 4;
+  static public int REVERB_WET_SHIFTED_FACTOR = 4;
   static public int REVERB_WET_HIGHPASS_FREQUENCY = 1000;
   static public float REVERB_WET_HIGHPASS_RESONANCE = 0;
 
